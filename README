@@ -1,0 +1,14 @@
+An unnamed Forth project for the STM8
+=====================================
+
+The C compilers for the STM8 are rather bad, and no wonder, given that it
+is essentially an old-style accumulator architecture completely unsuitable
+for modern register allocators.  I was asked by one of my friends to
+to review the situation and thought it would be interesting to change the
+problem and implement a (tethered) Forth for it.  This is the record of
+that effort, but it might also end up bringing together other related
+pieces of code I have lying around.  I currently assume an STM8S-DISCOVERY
+board whenever necessary, the generalization will come later.
+
+The files here are dedicated into the public domain using CC0, see the
+DEDICATION for details.
