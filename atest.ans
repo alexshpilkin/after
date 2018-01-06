@@ -1,0 +1,272 @@
+S" shim.ans" included
+
+: stack
+  depth dup
+  begin ?dup while  rot push  1-  repeat
+  begin ?dup while  pop dup .  swap 1-  repeat ;
+: (stack)   ." ( " stack ." ) " ;
+: ?stack   depth 0 <> ?abort" STACK? " ;
+
+vocabulary assembler   also assembler definitions
+
+: ub.  $FF and 0 <# bl hold # # #> type ;
+: b,   dup ub.   b, ;
+: b!   2dup here - . ub. ." ! "   b! ;
+
+S" assem.fth" included
+
+?stack hex   vocabulary test   also test definitions
+
+\ : b) ) ; : w) ) ; : b)) )) ; : w)) )) ;
+\ : b,X) ,X) ; : w,X) ,X) ; : b),X) ),X) ; : w),X) ),X) ;
+\ : b,Y) ,Y) ; : w,Y) ,Y) ; : b),Y) ),Y) ;
+
+57 # add, cr                    ( AB 57 )
+57 b) add, cr                   ( BB 57 )
+5767 w) add, cr                 ( CB 57 67 )
+X) add, cr                      ( FB )
+57 b,X) add, cr                 ( EB 57 )
+5767 w,X) add, cr               ( DB 57 67 )
+Y) add, cr                      ( 90 FB )
+57 b,Y) add, cr                 ( 90 EB 57 )
+5767 w,Y) add, cr               ( 90 DB 57 67 )
+57 ,S) add, cr                  ( 1B 57 )
+57 b)) add, cr                  ( 92 CB 57 )
+5767 w)) add, cr                ( 72 CB 57 67 )
+57 b),X) add, cr                ( 92 DB 57 )
+5767 w),X) add, cr              ( 72 DB 57 67 )
+57 b),Y) add, cr cr             ( 91 DB 57 )
+
+A dec, cr                       ( 4A )
+57 b) dec, cr                   ( 3A 57 )
+5767 w) dec, cr                 ( 72 5A 57 67 )
+X) dec, cr                      ( 7A )
+57 b,X) dec, cr                 ( 6A 57 )
+5767 w,X) dec, cr               ( 72 4A 57 67 )
+Y) dec, cr                      ( 90 7A )
+57 b,Y) dec, cr                 ( 90 6A 57 )
+5767 w,Y) dec, cr               ( 90 4A 57 67 )
+57 ,S) dec, cr                  ( 0A 57 )
+57 b)) dec, cr                  ( 92 3A 57 )
+5767 w)) dec, cr                ( 72 3A 57 67 )
+57 b),X) dec, cr                ( 92 6A 57 )
+5767 w),X) dec, cr              ( 72 6A 57 67 )
+57 b),Y) dec, cr                ( 91 6A 57 )
+X dec, cr                       ( 5A )
+Y dec, cr cr                    ( 90 5A )
+
+57 # lda, cr                    ( A6 57 )
+57 b) lda, cr                   ( B6 57 )
+5767 w) lda, cr                 ( C6 57 67 )
+X) lda, cr                      ( F6 )
+57 b,X) lda, cr                 ( E6 57 )
+5767 w,X) lda, cr               ( D6 57 67 )
+Y) lda, cr                      ( 90 F6 )
+57 b,Y) lda, cr                 ( 90 E6 57 )
+5767 w,Y) lda, cr               ( 90 D6 57 67 )
+57 ,S) lda, cr                  ( 7B 57 )
+57 b)) lda, cr                  ( 92 C6 57 )
+5767 w)) lda, cr                ( 72 C6 57 67 )
+57 b),X) lda, cr                ( 92 D6 57 )
+5767 w),X) lda, cr              ( 72 D6 57 67 )
+57 b),Y) lda, cr cr             ( 91 D6 57 )
+
+57 b) sta, cr                   ( B7 57 )
+5767 w) sta, cr                 ( C7 57 67 )
+X) sta, cr                      ( F7 )
+57 b,X) sta, cr                 ( E7 57 )
+5767 w,X) sta, cr               ( D7 57 67 )
+Y) sta, cr                      ( 90 F7 )
+57 b,Y) sta, cr                 ( 90 E7 57 )
+5767 w,Y) sta, cr               ( 90 D7 57 67 )
+57 ,S) sta, cr                  ( 6B 57 )
+57 b)) sta, cr                  ( 92 C7 57 )
+5767 w)) sta, cr                ( 72 C7 57 67 )
+57 b),X) sta, cr                ( 92 D7 57 )
+5767 w),X) sta, cr              ( 72 D7 57 67 )
+57 b),Y) sta, cr cr             ( 91 D7 57 )
+
+5767 # ldx, cr                  ( AE 57 67 )
+57 b) ldx, cr                   ( BE 57 )
+5767 w) ldx, cr                 ( CE 57 67 )
+X) ldx, cr                      ( FE )
+57 b,X) ldx, cr                 ( EE 57 )
+5767 w,X) ldx, cr               ( DE 57 67 )
+57 ,S) ldx, cr                  ( 1E 57 )
+57 b)) ldx, cr                  ( 92 CE 57 )
+5767 w)) ldx, cr                ( 72 CE 57 67 )
+57 b),X) ldx, cr                ( 92 DE 57 )
+5767 w),X) ldx, cr cr           ( 72 DE 57 67 )
+
+57 b) stx, cr                   ( BF 57 )
+5767 w) stx, cr                 ( CF 57 67 )
+X) sty, cr                      ( FF )
+57 b,X) sty, cr                 ( EF 57 )
+5767 w,X) sty, cr               ( DF 57 67 )
+57 ,S) stx, cr                  ( 1F 57 )
+57 b)) stx, cr                  ( 92 CF 57 )
+5767 w)) stx, cr                ( 72 CF 57 67 )
+57 b),X) sty, cr                ( 92 DF 57 )
+5767 w),X) sty, cr cr           ( 72 DF 57 67 )
+
+5767 # ldy, cr                  ( 90 AE 57 67 )
+57 b) ldy, cr                   ( 90 BE 57 )
+5767 w) ldy, cr                 ( 90 CE 57 67 )
+Y) ldy, cr                      ( 90 FE )
+57 b,Y) ldy, cr                 ( 90 EE 57 )
+5767 w,Y) ldy, cr               ( 90 DE 57 67 )
+57 ,S) ldy, cr                  ( 16 57 )
+57 b)) ldy, cr                  ( 91 CE 57 )
+57 b),Y) ldy, cr cr             ( 91 DE 57 )
+
+57 b) sty, cr                   ( 90 BF 57 )
+5767 w) sty, cr                 ( 90 CF 57 67 )
+Y) stx, cr                      ( 90 FF )
+57 b,Y) stx, cr                 ( 90 EF 57 )
+5767 w,Y) stx, cr               ( 90 DF 57 67 )
+57 ,S) sty, cr                  ( 17 57 )
+57 b)) sty, cr                  ( 91 CF 57 )
+57 b),Y) stx, cr cr             ( 91 DF 57 )
+
+57 b) Y sti, cr                 ( 90 BF 57 )
+5767 w) Y sti, cr               ( 90 CF 57 67 )
+Y) X sti, cr                    ( 90 FF )
+57 b,Y) X sti, cr               ( 90 EF 57 )
+5767 w,Y) X sti, cr             ( 90 DF 57 67 )
+57 ,S) Y sti, cr                ( 17 57 )
+57 b)) Y sti, cr                ( 91 CF 57 )
+57 b),Y) X sti, cr cr           ( 91 DF 57 )
+
+X rla, cr                       ( 02 )
+Y rla, cr cr                    ( 90 02 )
+
+mlx, cr                         ( 42 )
+mly, cr cr                      ( 90 42 )
+
+5767 w) jmp, cr                 ( CC 57 67 )
+X) jmp, cr                      ( FC )
+57 b,X) jmp, cr                 ( EC 57 )
+5767 w,X) jmp, cr               ( DC 57 67 )
+Y) jmp, cr                      ( 90 FC )
+57 b,Y) jmp, cr                 ( 90 EC 57 )
+5767 w,Y) jmp, cr               ( 90 DC 57 67 )
+57 b)) jmp, cr                  ( 92 CC 57 )
+5767 w)) jmp, cr                ( 72 CC 57 67 )
+57 b),X) jmp, cr                ( 92 DC 57 )
+5767 w),X) jmp, cr              ( 72 DC 57 67 )
+57 b),Y) jmp, cr cr             ( 91 DC 57 )
+
+return backward jmp, cr         ( 20 FE )
+forward jmp, resolve cr cr      ( 20 FE -1 00 ! )
+
+here & cs ?jr, cr               ( 25 FE )
+here & eq ?jr, cr               ( 27 FE )
+here & nv ?jr, cr               ( 21 FE )
+( FIXME half-carry                90 29 FE )
+( FIXME interrupt high            90 2F FE )
+( FIXME interrupt low             90 2E FE )
+( FIXME interrupt mask            90 2D FE )
+here & mi ?jr, cr               ( 2B FE )
+here & cc ?jr, cr               ( 24 FE )
+here & ne ?jr, cr               ( 26 FE )
+( FIXME not half-carry            90 28 FE )
+( FIXME not interrupt mask        90 2C FE )
+here & vc ?jr, cr               ( 28 FE )
+here & pl ?jr, cr               ( 2A FE )
+here & ge ?jr, cr               ( 2E FE )
+here & gt ?jr, cr               ( 2C FE )
+here & le ?jr, cr               ( 2D FE )
+here & lt ?jr, cr               ( 2F FE )
+here & al ?jr, cr               ( 20 FE )
+here & hs ?jr, cr               ( 24 FE )
+here & hi ?jr, cr               ( 22 FE )
+here & ls ?jr, cr               ( 23 FE )
+here & cs ?jr, cr               ( 25 FE )
+here & lo ?jr, cr               ( 25 FE )
+here & vs ?jr, cr cr            ( 29 FE )
+
+5767 w) cal, cr                 ( CD 57 67 )
+X) cal, cr                      ( FD )
+57 b,X) cal, cr                 ( ED 57 )
+5767 w,X) cal, cr               ( DD 57 67 )
+Y) cal, cr                      ( 90 FD )
+57 b,Y) cal, cr                 ( 90 ED 57 )
+5767 w,Y) cal, cr               ( 90 DD 57 67 )
+57 b)) cal, cr                  ( 92 CD 57 )
+5767 w)) cal, cr                ( 72 CD 57 67 )
+57 b),X) cal, cr                ( 92 DD 57 )
+5767 w),X) cal, cr              ( 72 DD 57 67 )
+57 b),Y) cal, cr cr             ( 91 DD 57 )
+
+return backward cal, cr         ( AD FE )
+forward cal, resolve cr cr      ( AD FE -1 00 ! )
+
+XL,A tfr, cr                    ( 97 )
+A,XL tfr, cr                    ( 9F )
+YL,A tfr, cr                    ( 90 97 )
+A,YL tfr, cr                    ( 90 9F )
+XH,A tfr, cr                    ( 95 )
+A,XH tfr, cr                    ( 9E )
+YH,A tfr, cr                    ( 90 95 )
+A,YH tfr, cr cr                 ( 90 9E )
+
+Y,X tfr, cr                     ( 90 93 )
+X,Y tfr, cr                     ( 93 )
+X,S tfr, cr                     ( 96 )
+S,X tfr, cr                     ( 94 )
+Y,S tfr, cr                     ( 90 96 )
+S,Y tfr, cr cr                  ( 90 94 )
+
+A,XL exg, cr                    ( 41 )
+XL,A exg, cr                    ( 41 )
+A,YL exg, cr                    ( 61 )
+YL,A exg, cr cr                 ( 61 )
+( A, 5767 w] exg, cr   FIXME )
+
+X,Y exg, cr cr                  ( 51 )
+
+5767 # cpx, cr                  ( A3 57 67 )
+57 b) cpx, cr                   ( B3 57 )
+5767 w) cpx, cr                 ( C3 57 67 )
+Y) cpx, cr                      ( 90 F3 )
+57 b,Y) cpx, cr                 ( 90 E3 57 )
+5767 w,Y) cpx, cr               ( 90 D3 57 67 )
+57 ,S) cpx, cr                  ( 13 57 )
+57 b)) cpx, cr                  ( 92 C3 57 )
+5767 w)) cpx, cr                ( 72 C3 57 67 )
+57 b),Y) cpx, cr                ( 91 D3 57 )
+
+A pop, cr                       ( 84 )
+C pop, cr                       ( 86 )
+5767 w) pop, cr cr              ( 32 57 67 )
+
+X pop, cr                       ( 85 )
+Y pop, cr cr                    ( 90 85 )
+
+A psh, cr                       ( 88 )
+C psh, cr                       ( 8A )
+57 # psh, cr                    ( 4B 57 )
+5767 w) psh, cr cr              ( 3B 57 67 )
+
+X psh, cr                       ( 89 )
+Y psh, cr cr                    ( 90 89 )
+
+1543 w) 57 # mov, cr            ( 35 57 15 43 )
+57 b) 67 b) mov, cr             ( 45 67 57 )
+1543 w) 5767 w) mov, cr cr      ( 55 57 67 15 43 )
+
+5767 w) 2 ccm, cr cr            ( 90 15 57 67 )
+
+here & 1543 w) 2 tjf, cr        ( 72 05 15 43 FB )
+forward 1543 w) 2 tjf, nop, resolve
+                          cr cr ( 72 05 15 43 FB 9D -2 01 ! )
+
+1543 # adx, cr                  ( 1C 15 43 )
+1543 w) adx, cr                 ( 72 BB 15 43 )
+57 b,S) adx, cr                 ( 72 FB 57 )
+1543 # ady, cr                  ( 72 A9 15 43 )
+1543 w) ady, cr                 ( 72 B9 15 43 )
+57 b,S) ady, cr                 ( 72 F9 57 )
+57 # ads, cr cr                 ( 5B 57 )
+
+?stack bye

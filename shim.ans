@@ -1,0 +1,56 @@
+: ,"       [char] " parse   over + swap   begin 2dup <> while
+  dup c@ c, 1+   repeat 2drop ;
+: label    create ;
+: ;does:   postpone does>  ; immediate
+
+label (brand   ," i4 ANS shim"
+(brand   here over -   2constant brand
+
+: push  postpone >r ; immediate
+: pop   postpone r> ; immediate
+: peek  postpone r@ ; immediate
+: stow  postpone dup postpone >r ; immediate
+: lose  postpone r> postpone drop ; immediate
+: tor   rot rot ;
+
+: +under  ( x y z -- x+z y )
+  swap   push + pop ;
+: within  ( x lo hi -- lo<=x<hi )
+  push   over <= swap   pop <  and ;
+: between ( x lo hi -- lo<=x<=hi )
+  push   over <= swap   pop <= and ;
+
+: relax     ( do nothing ) ;
+: andif     postpone dup postpone if postpone drop ; immediate
+: unless    postpone 0= postpone if ; immediate
+: ?abort"   postpone abort" ; immediate
+: abort"    postpone true postpone ?abort" ; immediate
+: die       abort" IMPOSSIBLE? " ;
+
+: 16*       4 lshift ;
+: 16/       4 rshift ;
+: 256*      8 lshift ;
+: 256/      8 rshift ;
+: 65536*   16 lshift ;
+: 65536/   16 rshift ;
+
+: save    ( a -- x a )   dup @ swap ;
+: restore ( x a -- )     ! ;
+
+: digit ( u -- c )   dup 0 9 between if   [char] 0 +   else 10 -
+  dup 0 25 between 0= ?abort" digit? "   [char] A +   then ;
+
+: b!   swap 255 and swap c! ;
+: ub@  c@ 255 and ;
+: b,   255 and c, ;
+
+variable serial   variable buffer
+: ?ior   0<> ?abort" i/o error " ;
+: (connect   r/w bin open-file ?ior serial ! ;
+: connect"   [char] " parse (connect ;
+: disconnect   serial @ close-file ?ior ;
+: send ( u -- )   255 and buffer tuck b!   1 serial @
+  write-file ?ior ;
+: recv ( -- u )   buffer   dup 1 serial @ read-file ?ior
+  1 <> ?abort" receive? "   ( buffer ) ub@ ;
+: wait ( -- )   serial @ flush-file ?ior ;

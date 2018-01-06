@@ -1,0 +1,5 @@
+#!/bin/sed -Enf
+# invoke with `output <FORTH >OUTPUT`
+
+s/.*cr cr.*/\0\n/
+s/.*\( ([[:xdigit:]][[:xdigit:]] [^)]*)\)/\1/p

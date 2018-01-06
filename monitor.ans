@@ -1,0 +1,64 @@
+vocabulary shim   also shim definitions
+S" shim.ans" included
+
+vocabulary meta   also meta definitions
+S" image.fth" included   ( ub@ b!   memory range empty ihex )
+S" here.fth"  included   ( here allot b, )
+S" assem.fth" included   ( w! w, etc.    )
+
+hex
+
+100 memory
+  8000 0100 range
+
+5240 ( UART2 )
+  dup     constant SR     dup 1 + constant DR
+  dup 2 + constant BRR1   dup 3 + constant BRR2
+    ( 4 +          CR1 )  dup 5 + constant CR2
+drop
+
+8000 constant vectors
+: 0vectors   vectors dup 80 + swap   begin 2dup <> while
+  0 over int!   4 + repeat ;
+0vectors
+
+8080 to here   forward jmp,             ( REENTRY POINT )
+
+here constant recvb
+  here & SR ) 5 tjf,                    ( rx wait       )
+  DR ) lda,   SR ) 5 res,               ( rx read & clr )
+  ret,
+
+here constant recvw
+  recvb & cal, x rla,                   ( rx high       )
+  recvb & cal, x rla,                   ( rx low        )
+  ret,
+
+here constant read
+  recvw & cal,   x) lda,                ( rx address    )
+  here & SR ) 7 tjf,   DR ) sta,        ( tx byte       )
+  forward jmp,                          ( loop          )
+
+here constant write
+  recvw & cal,   recvb & cal,           ( rx addr byte  )
+  x) sta,   forward jmp,                ( store & loop  )
+
+here constant jump
+  recvw & cal,   x) jmp,                ( rx addr & jmp )
+
+here vectors int!                       (  ENTRY POINT  )
+
+50C6 ) 0 # mov,                         ( 16MHz HSI osc )
+BRR2 ) 0A # mov,   BRR1 ) 08 # mov,     ( 115200 baud   )
+CR2  ) 0C # mov,                        ( rx/tx enable  )
+
+resolve ( write ) resolve ( read ) resolve ( reentry )
+
+begin,                                  ( echo loop     )
+  recvb & cal,                          ( rx command    )
+  0 # cpa,   read & eq ?jr,             ( 00 = read     )
+  1 # cpa,   write & eq ?jr,            ( 01 = write    )
+  2 # cpa,   jump & eq ?jr,             ( 02 = jump     )
+again,                                  ( ignore others )
+
+ihex bye

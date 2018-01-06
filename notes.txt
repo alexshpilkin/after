@@ -1,0 +1,41 @@
+Opcode map
+==========
+
+                                         BINARY   BIT/                  UNARY   BCH     NULLARY
+    BIT/BIT/    ADW/    ADW/                ADW/
+             1x      Ax      Bx  Cx  Dx  Ex      Fx        0x  3x  4x  5x  6x  7x    2x    8x    9x
+x0  cpl/set/sub     sub SBX/sub sub sub sub SBX/sub   tjt/neg neg neg neg neg neg   jal   irt   pdi
+x1  ccm/res/cmp     cmp     cmp cmp cmp cmp     cmp   tjf(rrw|exg|exg|exg|exg)      jnv   ret   pix
+x2  cpl/set/sbc SBY/sbc SBY/sbc sbc sbc sbc SBY/sbc   tjt(rlw|POP|MUL)   (DIV|PWS)  jhi  (INT)  piy
+x3  ccm/res(cpw)   (cpw)   (cpw|cpw|cpw|cpw)   (cpw)  tjf/not not not not not not   jls   trp  (LDW)
+x4  cpl/set/and     and     and and and and     and   tjt/srl srl srl srl srl srl   jhs  (POP) (STX)
+x5  ccm/res/bcp     bcp     bcp bcp bcp bcp     bcp   tjf/               (DIV)      jlo  (POP) (STA)
+x6  cpl/set(LDW)    lda     lda lda lda lda     lda   tjt/rrc rrc rrc rrc rrc rrc   jne  (POP) (LDX)
+x7  ccm/res/        STA     sta sta sta sta     sta   tjf/sra sra sra sra sra sra   jeq   rtf  (LDA)
+x8  cpl/set/xor     xor     xor xor xor xor     xor   tjt/sll sll sll sll sll sll   jvc  (PSH)  rcf
+x9  ccm/res/adc ADY/adc ADY/adc adc adc adc ADY/adc   tjf/rlc rlc rlc rlc rlc rlc   jvs  (PSH)  scf
+xA  cpl/set/orr     orr     orr orr orr orr     orr   tjt/dec dec dec dec dec dec   jpl  (PSH)  rim
+xB  ccm/res/add     add ADX/add add add add ADX/add   tjf/   (PSH|PSH|ADS|LDA|STA)  jmi   brk   sim
+xC  cpl/set(ADX)    JMP    (LDA)jmp jmp jmp     jmp   tjt/inc inc inc inc inc inc   jgt   ccf   rvf
+xD  ccm/res(SBX)    CAL    (STA)cal cal cal     cal   tjf/tnz tnz tnz tnz tnz tnz   jle  (CAL)  nop
+xE  cpl/set/LDW     LDW     LDW LDW LDW LDW     LDW   tjt/swp swp swp swp swp swp   jge   hlt  (LDA)
+xF  ccm/res/STW    (LDA)    STW STW STW STW     STW   tjf/clr clr clr clr clr clr   jlt  (wf*) (LDA)
+
+Notes
+=====
+
+AD would be CALL imm but is CALLR rel
+
+A7 would be STA imm but is STA FAR
+AC     "    JMP imm but is JMP FAR
+AF     "    STW imm but is LDA FAR
+
+.e lda          bc af 90,af             ø ,X ,Y
+.e sta          bd a7 90,a7             ø ,X ,Y
+.e cal          8d                      ø
+.e jmp          ac                      ø
+
+.w.e lda        92,bc 92,af 91,af       ) )X )Y
+.w.e sta        92,bd 92,a7 91,a7       ) )X )Y
+.w.e cal        92,8d                   )
+.w.e jmp        92,ac  ( ie JMP imm )   )
