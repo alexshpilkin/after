@@ -27,6 +27,8 @@ label (brand   ," i4 ANS shim"
 : abort"    postpone true postpone ?abort" ; immediate
 : die       abort" IMPOSSIBLE? " ;
 
+: 4*        2 lshift ;
+: 4/        2 rshift ;
 : 16*       4 lshift ;
 : 16/       4 rshift ;
 : 256*      8 lshift ;

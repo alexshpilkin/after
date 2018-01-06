@@ -17,11 +17,7 @@ hex
     ( 4 +          CR1 )  dup 5 + constant CR2
 drop
 
-8000 constant vectors
-: 0vectors   vectors dup 80 + swap   begin 2dup <> while
-  0 over int!   4 + repeat ;
-0vectors
-
+0vectors                                ( vector table  )
 8080 to here   forward jmp,             ( REENTRY POINT )
 
 here constant recvb
@@ -46,7 +42,7 @@ here constant write
 here constant jump
   recvw & cal,   x) jmp,                ( rx addr & jmp )
 
-here vectors int!                       (  ENTRY POINT  )
+here 0 !vector                          (  ENTRY POINT  )
 
 50C6 ) 0 # mov,                         ( 16MHz HSI osc )
 BRR2 ) 0A # mov,   BRR1 ) 08 # mov,     ( 115200 baud   )

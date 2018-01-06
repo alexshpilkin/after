@@ -264,6 +264,11 @@ label (adi/sbi)   ( precode; high nibble of opcode )
   9C nullary rvf,    9D nullary nop,
 ( 9E TFR A,XYH  )  ( 9F TFR A,XYL  )
 
-: int! ( a a -- )   8200 over w!   2 + w! ;
+: vector  ( u -- a )   dup 20 u> ?abort" vector? " 4* 8002 or ;
+: !vector ( a u -- )   vector w! ;
+: @vector ( u -- a )   vector w@ ;
+
+: 0vectors ( -- )   8080 8000 begin 2dup <> while   8200 over w!
+  2 + 0000 over w!   2 + repeat ;
 
 ( base ) restore
