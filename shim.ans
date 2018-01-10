@@ -3,7 +3,7 @@
 : label    create ;
 : ;does:   postpone does>  ; immediate
 
-label (brand   ," i4 ANS shim"
+label (brand   ," 48 ANS Forth shim $Format:git-%h$"
 (brand   here over -   2constant brand
 
 : push  postpone >r ; immediate

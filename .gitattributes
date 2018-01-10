@@ -1,0 +1,6 @@
+/.gitattributes export-ignore
+/.gitignore     export-ignore
+/shim.ans       export-subst
+
+README          linguist-language=Markdown
+*.ans           linguist-language=Forth

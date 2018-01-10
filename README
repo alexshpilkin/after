@@ -10,5 +10,25 @@ that effort, but it might also end up bringing together other related
 pieces of code I have lying around.  I currently assume an STM8S-DISCOVERY
 board whenever necessary, the generalization will come later.
 
-The files here are dedicated into the public domain using CC0, see the
-DEDICATION for details.
+The files here are dedicated to the public domain, or failing that
+permissively licensed.  See the DEDICATION for details.
+
+Getting it running
+------------------
+
+The one thing you can currently do is assemble things into the RAM of a
+live STM8S-DISCOVERY board over a serial connection.  Run `monitor.ans`
+under an ANS Forth system, save the output into an Intel HEX file and
+program it onto the board (using stm8flash or what have you).  Connect its
+UART2 to your computer, then read through and run `connect.ans`, modifying
+it as needed.  Your assembly language routines can jump to 8080 hex to
+return back to the monitor loop.
+
+Offline assembly is also possible; use `monitor.ans` as a model.  Aside
+from Intel HEX (generated from the current memory image by `IHEX`), the
+Motorola S-record format is also supported through the word `SREC`.
+
+The monitor itself is a mostly literal translation of Sergeant's
+"3-instruction Forth" for the 68HC11 and is 77 bytes long.  I do not see
+how it could be made shorter (even at the cost of changing the protocol),
+but any suggestions are welcome.

@@ -50,7 +50,7 @@ CR2  ) 0C # mov,                        ( rx/tx enable  )
 
 resolve ( write ) resolve ( read ) resolve ( reentry )
 
-begin,                                  ( echo loop     )
+begin,                                  ( command loop  )
   recvb & cal,                          ( rx command    )
   0 # cpa,   read & eq ?jr,             ( 00 = read     )
   1 # cpa,   write & eq ?jr,            ( 01 = write    )
