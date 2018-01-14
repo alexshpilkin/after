@@ -5,6 +5,7 @@ vocabulary meta   also meta definitions
 S" image.fth" included   ( ub@ b!   memory range empty ihex )
 S" here.fth"  included   ( here allot b, )
 S" assem.fth" included   ( w! w, etc.    )
+S" proto.fth" included   ( 'read etc.    )
 
 hex
 
@@ -18,29 +19,25 @@ hex
 drop
 
 0vectors                                ( vector table  )
-8080 to here   forward jmp,             ( REENTRY POINT )
 
-here constant recvb
-  here & SR ) 5 tjf,                    ( rx wait       )
-  DR ) lda,   SR ) 5 res,               ( rx read & clr )
-  ret,
+8080 to here                            ( start of code )
+: entry ( a -- )   here <> ?abort" entry? " ;
 
 here constant recvw
-  recvb & cal, x rla,                   ( rx high       )
-  recvb & cal, x rla,                   ( rx low        )
-  ret,
+  forward cal,   ( FALLTHROUGH )        ( rx high low   )
+here constant recvb   resolve
+  here & SR ) 5 tjf,                    ( rx wait       )
+  DR ) lda,   x rla,                    ( rx read       )
+  SR ) 5 res,   ret,                    ( rx release    )
 
-here constant read
+'read entry
   recvw & cal,   x) lda,                ( rx address    )
   here & SR ) 7 tjf,   DR ) sta,        ( tx byte       )
   forward jmp,                          ( loop          )
 
-here constant write
-  recvw & cal,   recvb & cal,           ( rx addr byte  )
+'write entry
+  recvb & cal,   recvw & cal,           ( rx byte addr  )
   x) sta,   forward jmp,                ( store & loop  )
-
-here constant jump
-  recvw & cal,   x) jmp,                ( rx addr & jmp )
 
 here 0 !vector                          (  ENTRY POINT  )
 
@@ -48,13 +45,8 @@ here 0 !vector                          (  ENTRY POINT  )
 BRR2 ) 0A # mov,   BRR1 ) 08 # mov,     ( 115200 baud   )
 CR2  ) 0C # mov,                        ( rx/tx enable  )
 
-resolve ( write ) resolve ( read ) resolve ( reentry )
+'loop entry ( write> ) resolve ( read> ) resolve
 
-begin,                                  ( command loop  )
-  recvb & cal,                          ( rx command    )
-  0 # cpa,   read & eq ?jr,             ( 00 = read     )
-  1 # cpa,   write & eq ?jr,            ( 01 = write    )
-  2 # cpa,   jump & eq ?jr,             ( 02 = jump     )
-again,                                  ( ignore others )
+recvw & cal,   x) jmp,                  ( rx addr & jmp )
 
 ihex bye

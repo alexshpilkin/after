@@ -2,6 +2,7 @@ vocabulary shim   also shim definitions
 S" shim.ans" included
 
 vocabulary live   also live definitions
+S" proto.fth" included   ( 'read etc.    )
 S" live.fth"  included   ( ub@ b! go     )
 S" here.fth"  included   ( here allot b, )
 S" assem.fth" included   ( w! w, etc.    )
@@ -19,10 +20,10 @@ hex
   begin ?dup while  pop dup .  swap 1-  repeat ;
 : (stack)   ." ( " stack ." ) " ;
 
-( port must be set to 115200 baud, 8N1, raw mode         )
-( e.g. stty 115200 cs8 -cstopb -parity raw </dev/ttyUSB0 )
+( port must be set to 115200 baud, 8N1, raw mode, no echo      )
+( e.g. stty 115200 cs8 -cstopb -parity raw -echo </dev/ttyUSB0 )
 connect" /dev/ttyUSB0"
 
 : rewind   0 to here ;
-rewind   5011 ) 0 set, 8080 ) jmp, 0 go   ( PD0 is OD output   )
-rewind   500F ) 0 cpl, 8080 ) jmp,        ( '0 go' toggles LED )
+rewind   5011 ) 0 set, 'loop ) jmp, 0 go  ( PD0 is OD output   )
+rewind   500F ) 0 cpl, 'loop ) jmp,       ( '0 go' toggles LED )

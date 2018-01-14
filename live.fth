@@ -1,3 +1,3 @@
-: ub@ ( a -- u )   0 send   dup 256/ send send   wait recv ; 
-: b!  ( u a -- )   1 send   dup 256/ send send   send wait ;
-: go  ( a -- )     2 send   dup 256/ send send   wait ;
+: go ( a -- )   dup 256/ send send   wait ;
+: ub@   'read  go   dup 256/ send send   wait recv ;
+: b!    'write go   swap send   dup 256/ send send   wait ;
