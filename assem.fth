@@ -4,7 +4,7 @@ base save hex
 : w!   over 256/ over b! 1+ b! ;
 ( b,   required )
 : w,   dup 256/ b, b, ;
-: j,   here 1+ -   dup b,
+: j,   where @ 1+ -   dup b,
   -80 7F between 0= ?abort" jump offset? " ;
 
 : ?b   ?abort" bit number? " ;
@@ -55,11 +55,12 @@ drop
 '  w,X) '  w,Y) x/y  w,I)   '   ,X) '   ,Y) x/y  ,I)
 ' b),X) ' b),Y) x/y b),I)   '  ),X) '  ),Y) x/y ),I)
 
-: return   ( -- dest )     here ;
+: return   ( -- dest )     where @ ;
 ( backward ( dest -- o )   & constant backward
-: forward  ( -- orig o )   here here & ;
-: resolve  ( orig -- )     ( this has to inspect the opcode )
-  dup ub@ 72 = if 5 + else 2 + then   here over -   swap 1- b! ;
+: forward  ( -- orig o )   where @ dup & ;
+( FIXME inspects the opcode -- only use of ub@ )
+: resolve  ( orig -- )   dup ub@ 72 = if 5 + else 2 + then
+  where @ over -   swap 1- b! ;
 
 label (operand)   ( semantics of operand )
   ' relax , ' die   , ' b, , ' w, , ' b, , ' w, , ' b, , ' j, ,

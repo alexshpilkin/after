@@ -3,7 +3,7 @@ S" shim.ans" included
 
 vocabulary meta   also meta definitions
 S" image.fth" included   ( ub@ b!   memory range empty ihex )
-S" here.fth"  included   ( here allot b, )
+S" where.fth" included   ( where b,      )
 S" assem.fth" included   ( w! w, etc.    )
 S" proto.fth" included   ( 'read etc.    )
 
@@ -20,26 +20,26 @@ drop
 
 0vectors                                ( vector table  )
 
-8080 to here                            ( start of code )
-: entry ( a -- )   here <> ?abort" entry? " ;
+8080 where !                            ( start of code )
+: entry ( a -- )   where @ <> ?abort" entry? " ;
 
-here constant recvw
+where @ constant recvw
   forward cal,   ( FALLTHROUGH )        ( rx high low   )
-here constant recvb   resolve
-  here & SR ) 5 tjf,                    ( rx wait       )
+where @ constant recvb   resolve
+  where @ & SR ) 5 tjf,                 ( rx wait       )
   DR ) lda,   x rla,                    ( rx read       )
   SR ) 5 res,   ret,                    ( rx release    )
 
 'read entry
   recvw & cal,   x) lda,                ( rx address    )
-  here & SR ) 7 tjf,   DR ) sta,        ( tx byte       )
+  where @ & SR ) 7 tjf,   DR ) sta,     ( tx byte       )
   forward jmp,                          ( loop          )
 
 'write entry
   recvb & cal,   recvw & cal,           ( rx byte addr  )
   x) sta,   forward jmp,                ( store & loop  )
 
-here 0 !vector                          (  ENTRY POINT  )
+where @ 0 !vector                       (  ENTRY POINT  )
 
 50C6 ) 0 # mov,                         ( 16MHz HSI osc )
 BRR2 ) 0A # mov,   BRR1 ) 08 # mov,     ( 115200 baud   )

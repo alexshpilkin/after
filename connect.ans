@@ -4,7 +4,7 @@ S" shim.ans" included
 vocabulary live   also live definitions
 S" proto.fth" included   ( 'read etc.    )
 S" live.fth"  included   ( ub@ b! go     )
-S" here.fth"  included   ( here allot b, )
+S" where.fth" included   ( where b,      )
 S" assem.fth" included   ( w! w, etc.    )
 
 hex
@@ -24,6 +24,6 @@ hex
 ( e.g. stty 115200 cs8 -cstopb -parity raw -echo </dev/ttyUSB0 )
 connect" /dev/ttyUSB0"
 
-: rewind   0 to here ;
+: rewind   0 where ! ;
 rewind   5011 ) 0 set, 'loop ) jmp, 0 go  ( PD0 is OD output   )
 rewind   500F ) 0 cpl, 'loop ) jmp,       ( '0 go' toggles LED )
