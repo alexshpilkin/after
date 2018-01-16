@@ -1,2 +1,2 @@
-0 variable where
+variable where
 : b, ( u -- )   where dup @   rot over b!   1+ swap ! ;

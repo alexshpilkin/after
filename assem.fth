@@ -60,7 +60,8 @@ drop
 : forward  ( -- orig o )   where @ dup & ;
 ( FIXME inspects the opcode -- only use of ub@ )
 : resolve  ( orig -- )   dup ub@ 72 = if 5 + else 2 + then
-  where @ over -   swap 1- b! ;
+  where @ over -   dup -80 7F between 0= ?abort" resolve? "
+  swap 1- b! ;
 
 label (operand)   ( semantics of operand )
   ' relax , ' die   , ' b, , ' w, , ' b, , ' w, , ' b, , ' j, ,
@@ -112,6 +113,7 @@ label (cal/jmp)   ( precode; high nibble of opcode )
 : begin,  ( -- dest )        return ;
 : again,  ( dest -- )        backward jmp, ;
 : until,  ( dest cc -- )     inv push   backward pop ?jr, ;
+: ahead,  ( -- orig )        forward jmp, ;
 : if,     ( cc -- orig )     inv push   forward pop ?jr, ;
 : else,   ( orig -- orig )   forward jmp,   swap resolve ;
 : then,   ( orig -- )        resolve ;
@@ -264,6 +266,8 @@ label (adi/sbi)   ( precode; high nibble of opcode )
   9A nullary rim,    9B nullary sim,
   9C nullary rvf,    9D nullary nop,
 ( 9E TFR A,XYH  )  ( 9F TFR A,XYL  )
+
+: align,   begin   where @ 3 and   while brk, repeat ;
 
 : vector  ( u -- a )   dup 20 u> ?abort" vector? " 4* 8002 or ;
 : !vector ( a u -- )   vector w! ;

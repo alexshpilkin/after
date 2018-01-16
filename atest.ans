@@ -9,7 +9,7 @@ S" shim.ans" included
 
 vocabulary assembler   also assembler definitions
 
-: ub.  $FF and 0 <# bl hold # # #> type ;
+: ub.  255 and 0 <# bl hold # # #> type ;
 : b,   dup ub.   b, ;
 : b!   2dup here - . ub. ." ! "   b! ;
 

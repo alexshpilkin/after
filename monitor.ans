@@ -34,12 +34,12 @@ where @ constant sendb
   x rla,   ret,                         ( shift into X  )
 
 'read entry
-  recvw & cal,   x) lda,                ( rx address    )
+  recvw & cal,   x) lda,                ( rx addr, read )
   sendb & cal,   forward jmp,           ( tx byte, loop )
 
 'write entry
   recvb & cal,   recvw & cal,           ( rx byte addr  )
-  x) sta,   forward jmp,                ( store & loop  )
+  x) sta,   forward jmp,                ( write, loop   )
 
 where @ 0 !vector                       (  ENTRY POINT  )
 

@@ -1,5 +1,6 @@
 vocabulary shim   also shim definitions
 S" shim.ans" included
+: ub.  255 and 0 <# bl hold # # #> type ;
 
 vocabulary live   also live definitions
 S" proto.fth" included   ( 'read etc.    )
@@ -9,9 +10,9 @@ S" assem.fth" included   ( w! w, etc.    )
 
 hex
 
-: dump ( a -- a+16 )   cr   dup 4 u.r 2 spaces   dup 10 + swap
-  begin 2dup <> while   dup ub@ 2 u.r space 1+   repeat drop ;
-: dumps ( a u -- a )   over + swap begin 2dup <> while   dump
+: dump ( a -- a+16 )   cr   dup 4 u.r 3 spaces   dup 10 + swap
+  begin 2dup <> while   dup ub@ ub. 1+   repeat drop ;
+: dumps ( a u -- a )   over + swap begin 2dup u> while   dump
   repeat drop ;
 
 : stack

@@ -1,9 +1,9 @@
 : ,"       [char] " parse   over + swap   begin 2dup <> while
   dup c@ c, 1+   repeat 2drop ;
 : label    create ;
-: ;does:   postpone does>  ; immediate
+: ;does:   postpone does> ; immediate
 
-label (brand   ," 48 ANS Forth shim $Format:git-%h$"
+label (brand   ," Quart ANS shim $Format:git-%h$"
 (brand   here over -   2constant brand
 
 : push  postpone >r ; immediate
