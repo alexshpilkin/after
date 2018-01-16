@@ -26,14 +26,16 @@ drop
 where @ constant recvw
   forward cal,   ( FALLTHROUGH )        ( rx high low   )
 where @ constant recvb   resolve
-  where @ & SR ) 5 tjf,                 ( rx wait       )
-  DR ) lda,   x rla,                    ( rx read       )
-  SR ) 5 res,   ret,                    ( rx release    )
+  where @ & SR ) 5 tjf,   DR ) lda,     ( rx byte in A  )
+  SR ) 5 res,                           ( clear buffer  )
+  ( FALLTHROUGH )                       ( echo, shift   )
+where @ constant sendb
+  where @ & SR ) 7 tjf,   DR ) sta,     ( tx byte in A  )
+  x rla,   ret,                         ( shift into X  )
 
 'read entry
   recvw & cal,   x) lda,                ( rx address    )
-  where @ & SR ) 7 tjf,   DR ) sta,     ( tx byte       )
-  forward jmp,                          ( loop          )
+  sendb & cal,   forward jmp,           ( tx byte, loop )
 
 'write entry
   recvb & cal,   recvw & cal,           ( rx byte addr  )

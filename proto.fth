@@ -1,5 +1,5 @@
 base save   hex
 
-8090 constant 'read   809D constant 'write   80B4 constant 'loop
+8098 constant 'read   809F constant 'write   80B6 constant 'loop
 
 ( base ) restore

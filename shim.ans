@@ -51,7 +51,7 @@ variable serial   variable buffer
 : (connect   r/w bin open-file ?ior serial ! ;
 : connect"   [char] " parse (connect ;
 : disconnect   serial @ close-file ?ior ;
-: send ( u -- )   255 and buffer tuck b!   1 serial @
+: xmit ( u -- )   255 and buffer tuck b!   1 serial @
   write-file ?ior ;
 : recv ( -- u )   buffer   dup 1 serial @ read-file ?ior
   1 <> ?abort" receive? "   ( buffer ) ub@ ;

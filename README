@@ -29,6 +29,6 @@ from Intel HEX (generated from the current memory image by `IHEX`), the
 Motorola S-record format is also supported through the word `SREC`.
 
 The monitor itself is a variation on Sergeant's "3-instruction Forth" for
-the 68HC11 and is 55 bytes long.  I do not see how it could be made
+the 68HC11 and is 57 bytes long.  I do not see how it could be made
 shorter (even at the cost of changing the protocol), but any suggestions
 are welcome.
