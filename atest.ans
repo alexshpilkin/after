@@ -1,4 +1,5 @@
-S" shim.ans" included
+S" shim.ans"  included
+S" where.fth" included
 
 : stack
   depth dup
@@ -11,11 +12,13 @@ vocabulary assembler   also assembler definitions
 
 : ub.  255 and 0 <# bl hold # # #> type ;
 : b,   dup ub.   b, ;
-: b!   2dup here - . ub. ." ! "   b! ;
+: b!   2dup where @ - . ub. ." ! "   b! ;
 
 S" assem.fth" included
 
 ?stack hex   vocabulary test   also test definitions
+
+here where !
 
 \ : b) ) ; : w) ) ; : b)) )) ; : w)) )) ;
 \ : b,X) ,X) ; : w,X) ,X) ; : b),X) ),X) ; : w),X) ),X) ;
@@ -159,31 +162,31 @@ Y) jmp, cr                      ( 90 FC )
 return backward jmp, cr         ( 20 FE )
 forward jmp, resolve cr cr      ( 20 FE -1 00 ! )
 
-here & cs ?jr, cr               ( 25 FE )
-here & eq ?jr, cr               ( 27 FE )
-here & nv ?jr, cr               ( 21 FE )
+where @ & cs ?jr, cr            ( 25 FE )
+where @ & eq ?jr, cr            ( 27 FE )
+where @ & nv ?jr, cr            ( 21 FE )
 ( FIXME half-carry                90 29 FE )
 ( FIXME interrupt high            90 2F FE )
 ( FIXME interrupt low             90 2E FE )
 ( FIXME interrupt mask            90 2D FE )
-here & mi ?jr, cr               ( 2B FE )
-here & cc ?jr, cr               ( 24 FE )
-here & ne ?jr, cr               ( 26 FE )
+where @ & mi ?jr, cr            ( 2B FE )
+where @ & cc ?jr, cr            ( 24 FE )
+where @ & ne ?jr, cr            ( 26 FE )
 ( FIXME not half-carry            90 28 FE )
 ( FIXME not interrupt mask        90 2C FE )
-here & vc ?jr, cr               ( 28 FE )
-here & pl ?jr, cr               ( 2A FE )
-here & ge ?jr, cr               ( 2E FE )
-here & gt ?jr, cr               ( 2C FE )
-here & le ?jr, cr               ( 2D FE )
-here & lt ?jr, cr               ( 2F FE )
-here & al ?jr, cr               ( 20 FE )
-here & hs ?jr, cr               ( 24 FE )
-here & hi ?jr, cr               ( 22 FE )
-here & ls ?jr, cr               ( 23 FE )
-here & cs ?jr, cr               ( 25 FE )
-here & lo ?jr, cr               ( 25 FE )
-here & vs ?jr, cr cr            ( 29 FE )
+where @ & vc ?jr, cr            ( 28 FE )
+where @ & pl ?jr, cr            ( 2A FE )
+where @ & ge ?jr, cr            ( 2E FE )
+where @ & gt ?jr, cr            ( 2C FE )
+where @ & le ?jr, cr            ( 2D FE )
+where @ & lt ?jr, cr            ( 2F FE )
+where @ & al ?jr, cr            ( 20 FE )
+where @ & hs ?jr, cr            ( 24 FE )
+where @ & hi ?jr, cr            ( 22 FE )
+where @ & ls ?jr, cr            ( 23 FE )
+where @ & cs ?jr, cr            ( 25 FE )
+where @ & lo ?jr, cr            ( 25 FE )
+where @ & vs ?jr, cr cr         ( 29 FE )
 
 5767 w) cal, cr                 ( CD 57 67 )
 X) cal, cr                      ( FD )
@@ -257,7 +260,7 @@ Y psh, cr cr                    ( 90 89 )
 
 5767 w) 2 ccm, cr cr            ( 90 15 57 67 )
 
-here & 1543 w) 2 tjf, cr        ( 72 05 15 43 FB )
+where @ & 1543 w) 2 tjf, cr     ( 72 05 15 43 FB )
 forward 1543 w) 2 tjf, nop, resolve
                           cr cr ( 72 05 15 43 FB 9D -2 01 ! )
 

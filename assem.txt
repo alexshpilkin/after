@@ -14,7 +14,7 @@ Host interface
 --------------
 
 The assembler uses only four words from the host system to
-inform it of the encoding process. These are HERE to retrieve
+inform it of the encoding process. These are WHERE to retrieve
 the current encoding address, B, to encode a byte, and
 optionally UB @ and B! to write a byte if forward branches are used.  The
 latter two words   .  The
