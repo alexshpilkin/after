@@ -32,19 +32,26 @@
 
 #include "prims.c"
 
-char const *const *symbol;
-word_t *restrict memory,
-        ibot, itop, iptr,
-        rbot, rtop, rptr,
-        dbot, dtop, dptr;
+static char const *const *symbol;
+static word_t *restrict memory,
+               iptr, ibot, itop,
+               rptr, rbot, rtop,
+               dptr, dbot, dtop;
 
-fault_t run(void) {
+static fault_t run(void) {
 
 #define addr(W) do { \
 	word_t a = (W); \
 	if slower(a < ibot || a >= itop) goto iaddr; \
 } while(0)
 
+#define chk(STACK) do { \
+	if slower(STACK##ptr < STACK##bot || STACK##bot < ibot || \
+	          STACK##ptr > STACK##top || STACK##top > itop) \
+		goto stack; \
+	if slower(rtop > dbot && dtop > rbot) \
+		goto stack; \
+} while(0)
 #define get(STACK, N) do { \
 	if slower(STACK##ptr - STACK##bot < (N)) goto uflow; \
 } while(0)
@@ -54,17 +61,19 @@ fault_t run(void) {
 #define pop(STACK) memory[--STACK##ptr]
 #define psh(STACK) memory[STACK##ptr++]
 
+#define rchk    chk(r)
 #define rget(N) get(r, (N))
 #define rput(N) put(r, (N))
 #define rpop    pop(r)
 #define rpsh    psh(r)
+#define dchk    chk(d)
 #define dget(N) get(d, (N))
 #define dput(N) put(d, (N))
 #define dpop    pop(d)
 #define dpsh    psh(d)
 
 	for (;;) {
-		word_t insn;
+		word_t insn, x;
 
 		trace fprintf(stderr, "%" PRI0 " ", iptr);
 		addr(iptr); insn = memory[iptr++];
@@ -105,19 +114,22 @@ FAULTS
 
 word_t image[] = {
 	0, 0, 0, 0,
-	8, 0xA, ~PHALT, 0,
-	~PEXIT, 0, 8, ~PEXIT,
+	0, 0, 0, 0,
+	0xB, 0xE, ~PHALT, ~PFETCHRP,
+	~PSTORERP, ~PEXIT, 0xB, ~PEXIT,
 };
 char const *const imsym[countof(image)] = {
 	0, 0, 0, 0,
-	"COLD", 0, 0, 0,
-	"ONE", 0, "TWO", 0,
+	0, 0, 0, 0,
+	"COLD", 0, 0, "ONE",
+	0, 0, "TWO", 0,
 };
 
 int main(int argc, char** argv) {
 	memory = &image[0]; symbol = &imsym[0];
-	dbot = dptr = dtop = rbot = rptr = 0,
-	rtop = ibot = iptr = 4;
+	dbot = dptr = ibot = 0;
+	dtop = rbot = rptr = 4,
+	rtop = iptr = 8;
 	itop = countof(image);
 
 	return run() ? EXIT_FAILURE : EXIT_SUCCESS;
