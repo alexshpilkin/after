@@ -24,6 +24,8 @@ typedef unsigned int word_t;
 #endif
 
 #define PRIMS \
+PRIM("ABORT", ABORT, goto abort;) \
+PRIM("HALT", HALT, trace fprintf(stderr, "halt\n"); return;) \
 PRIM("EXIT", EXIT, rget(1); iptr = rpop;) \
 PRIM("EXECUTE", EXECUTE, dget(1); rput(1); rpsh = iptr; iptr = dpop;) \
 /* PRIMS */

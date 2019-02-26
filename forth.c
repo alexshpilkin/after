@@ -42,14 +42,14 @@ void run(void) {
 
 #define addr(W) do { \
 	word_t a = (W); \
-	if slower(a < ibot || a >= itop) goto afault; \
+	if slower(a < ibot || a >= itop) goto iaddr; \
 } while(0)
 
 #define get(STACK, N) do { \
-	if slower(STACK##ptr - STACK##bot < (N)) goto ufault; \
+	if slower(STACK##ptr - STACK##bot < (N)) goto uflow; \
 } while(0)
 #define put(STACK, N) do { \
-	if slower(STACK##top - STACK##ptr < (N)) goto ofault; \
+	if slower(STACK##top - STACK##ptr < (N)) goto oflow; \
 } while(0)
 #define pop(STACK) memory[--STACK##ptr]
 #define psh(STACK) memory[STACK##ptr++]
@@ -96,20 +96,23 @@ PRIMS
 		}
 	}
 
-ufault:
+abort:
+	trace fprintf(stderr, "abort\n");
+	abort();
+iaddr:
+	trace fprintf(stderr, "invalid address\n");
+	abort();
+uflow:
 	trace fprintf(stderr, "underflow\n");
 	abort();
-ofault:
+oflow:
 	trace fprintf(stderr, "overflow\n");
-	abort();
-afault:
-	trace fprintf(stderr, "invalid address\n");
 	abort();
 }
 
 word_t image[] = {
 	0, 0, 0, 0,
-	8, 0xA, 4, 0,
+	8, 0xA, ~PHALT, 0,
 	~PEXIT, 0, 8, ~PEXIT,
 };
 char const *const imsym[countof(image)] = {
