@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "forth.h"
 
@@ -13,9 +14,26 @@
 #define faster(TEST) (TEST)
 #endif
 
+#define verifyof(E) (0 * (int)sizeof(int [1 - 2*!!(E)]))
+#if defined __GNUC__ || defined __clang__
+#define countof(A) \
+	(sizeof(A) / sizeof((A)[0]) + \
+	 verifyof(__builtin_types_compatible_p(__typeof__(A), \
+	                                       __typeof__(&(A)[0]))))
+#else
+#define countof(A) (sizeof(A) / sizeof((A)[0]))
+#endif
+
+#ifndef NTRACE
+#define trace if (0); else
+#else
+#define trace if (1); else
+#endif
+
 #include "prims.c"
 
-word_t *restrict image,
+char const *const *symbol;
+word_t *restrict memory,
         ibot, itop, iptr,
         rbot, rtop, rptr,
         dbot, dtop, dptr;
@@ -33,8 +51,8 @@ void run(void) {
 #define put(STACK, N) do { \
 	if slower(STACK##top - STACK##ptr < (N)) goto ofault; \
 } while(0)
-#define pop(STACK) image[--STACK##ptr]
-#define psh(STACK) image[STACK##ptr++]
+#define pop(STACK) memory[--STACK##ptr]
+#define psh(STACK) memory[STACK##ptr++]
 
 #define rget(N) get(r, (N))
 #define rput(N) put(r, (N))
@@ -48,20 +66,64 @@ void run(void) {
 	for (;;) {
 		word_t insn;
 
-		addr(iptr); insn = image[iptr++];
-		switch(~insn) {
-		default: rput(1); rpsh = iptr; iptr = insn;
+		trace fprintf(stderr, "%" PRI0 " ", iptr);
+		addr(iptr); insn = memory[iptr++];
+		trace fprintf(stderr, "%" PRI0 " ", insn);
+		switch ((word_t)~insn) {
+		default:
+			trace fprintf(stderr, "%-16s ",
+			              insn >= ibot && insn < itop && symbol &&
+			              symbol[insn] ? symbol[insn] : "");
+			rput(1); rpsh = iptr; iptr = insn;
 			break;
 #define PRIM(NAME, ID, BODY) \
-		case P##ID: { BODY } break;
+		case P##ID: \
+			trace fprintf(stderr, "%-16s ", NAME); \
+			{ BODY } break;
 PRIMS
 #include "prims.h"
 #undef PRIM
 		}
+		trace {
+			word_t i;
+			fprintf(stderr, "( ");
+			for (i = dbot; i < dptr; i++)
+				fprintf(stderr, "%" PRIX " ", memory[i]);
+			fprintf(stderr, ") ( R: ");
+			for (i = rbot; i < rptr; i++)
+				fprintf(stderr, "%" PRIX " ", memory[i]);
+			fprintf(stderr, ")\n");
+		}
 	}
 
 ufault:
-ofault:
-afault:
+	trace fprintf(stderr, "underflow\n");
 	abort();
+ofault:
+	trace fprintf(stderr, "overflow\n");
+	abort();
+afault:
+	trace fprintf(stderr, "invalid address\n");
+	abort();
+}
+
+word_t image[] = {
+	0, 0, 0, 0,
+	8, 0xA, 4, 0,
+	~PEXIT, 0, 8, ~PEXIT,
+};
+char const *const imsym[countof(image)] = {
+	0, 0, 0, 0,
+	"COLD", 0, 0, 0,
+	"ONE", 0, "TWO", 0,
+};
+
+int main(int argc, char** argv) {
+	memory = &image[0]; symbol = &imsym[0];
+	dbot = dptr = dtop = rbot = rptr = 0,
+	rtop = ibot = iptr = 4;
+	itop = countof(image);
+
+	run();
+	return 0;
 }
