@@ -1,6 +1,8 @@
 #ifndef FORTH_H_
 #define FORTH_H_ 1
 
+#include <limits.h>
+
 typedef unsigned int word_t;
 #define UMAX UINT_MAX
 #define SIGN ((UMAX >> 1) + 1)

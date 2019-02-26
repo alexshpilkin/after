@@ -21,7 +21,6 @@ word_t *restrict image,
         dbot, dtop, dptr;
 
 void run(void) {
-	word_t insn;
 
 #define addr(W) do { \
 	word_t a = (W); \
@@ -46,14 +45,19 @@ void run(void) {
 #define dpop    pop(d)
 #define dpsh    psh(d)
 
-	addr(iptr); insn = image[iptr++];
-	switch(~insn) {
-	default: rput(1); rpsh = iptr; iptr = insn;
+	for (;;) {
+		word_t insn;
+
+		addr(iptr); insn = image[iptr++];
+		switch(~insn) {
+		default: rput(1); rpsh = iptr; iptr = insn;
+			break;
 #define PRIM(NAME, ID, BODY) \
-	case P##ID: { BODY } break;
+		case P##ID: { BODY } break;
 PRIMS
 #include "prims.h"
 #undef PRIM
+		}
 	}
 
 ufault:
