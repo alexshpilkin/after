@@ -38,7 +38,7 @@ word_t *restrict memory,
         rbot, rtop, rptr,
         dbot, dtop, dptr;
 
-void run(void) {
+fault_t run(void) {
 
 #define addr(W) do { \
 	word_t a = (W); \
@@ -74,8 +74,7 @@ void run(void) {
 			trace fprintf(stderr, "%-16s ",
 			              insn >= ibot && insn < itop && symbol &&
 			              symbol[insn] ? symbol[insn] : "");
-			rput(1); rpsh = iptr; iptr = insn;
-			break;
+			rput(1); rpsh = iptr; iptr = insn; break;
 #define PRIM(NAME, ID, BODY) \
 		case P##ID: \
 			trace fprintf(stderr, "%-16s ", NAME); \
@@ -96,18 +95,12 @@ PRIMS
 		}
 	}
 
-abort:
-	trace fprintf(stderr, "abort\n");
-	abort();
-iaddr:
-	trace fprintf(stderr, "invalid address\n");
-	abort();
-uflow:
-	trace fprintf(stderr, "underflow\n");
-	abort();
-oflow:
-	trace fprintf(stderr, "overflow\n");
-	abort();
+#define FAULT(MSG, UPPER, LOWER) \
+LOWER: \
+	trace fprintf(stderr, "%s\n", MSG); \
+	return F##UPPER;
+FAULTS
+#undef FAULT
 }
 
 word_t image[] = {
@@ -127,6 +120,5 @@ int main(int argc, char** argv) {
 	rtop = ibot = iptr = 4;
 	itop = countof(image);
 
-	run();
-	return 0;
+	return run() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
