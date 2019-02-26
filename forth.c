@@ -1,31 +1,21 @@
+#include <stdlib.h>
+#include "forth.h"
+
+#if __STDC_VERSION__ < 199901L
+#define restrict
+#endif
+
 #if defined __GNUC__ || defined __clang__ || defined __icc__
 #define slower(TEST) (__builtin_expect(!!(TEST), 0))
 #define faster(TEST) (__builtin_expect(!!(TEST), 1))
+#else
+#define slower(TEST) (TEST)
+#define faster(TEST) (TEST)
 #endif
-
-#include <stdlib.h>
-
-typedef unsigned int word_t;
-#define UMAX UINT_MAX
-#define SIGN ((UMAX >> 1) + 1)
 
 #include "prims.c"
 
-#define PRIMS \
-PRIM("EXIT", EXIT, rget(1); iptr = rpop;) \
-PRIM("EXECUTE", EXECUTE, dget(1); rput(1); rpsh = iptr; iptr = dpop;) \
-/* PRIMS */
-
-enum {
-#define PRIM(NAME, ID, BODY) \
-	P##ID,
-PRIMS
-#include "prims.h"
-#undef PRIM
-	NPRIMS
-};
-
-word_t *image,
+word_t *restrict image,
         ibot, itop, iptr,
         rbot, rtop, rptr,
         dbot, dtop, dptr;
