@@ -15,12 +15,21 @@ S" assem.fth" included
 
 hex   S" tester.fth" included   ?stack
 
-\ : b) ) ; : w) ) ; : b)) )) ; : w)) )) ;
-\ : b,X) ,X) ; : w,X) ,X) ; : b),X) ),X) ; : w),X) ),X) ;
-\ : b,Y) ,Y) ; : w,Y) ,Y) ; : b),Y) ),Y) ;
+{ 57 )      -> 57 b/w)    } \ NB!
+{ 5767 )    -> 5767 w)    }
+{ 57 ))     -> 57 b))     }
+{ 5767 ))   -> 5767 w))   }
+{ 57 ,X)    -> 57 b,X)    }
+{ 5767 ,X)  -> 5767 w,X)  }
+{ 57 ),X)   -> 57 b),X)   }
+{ 5767 ),X) -> 5767 w),X) }
+{ 57 ,Y)    -> 57 b,Y)    }
+{ 5767 ,Y)  -> 5767 w,Y)  }
+{ 57 b),Y)  -> 57 ),Y)    }
 
 { 57 # add, }                   { dict -> AB 57 }
 { 57 b) add, }                  { dict -> BB 57 }
+{ 57 b/w) add, }                { dict -> BB 57 }
 { 5767 w) add, }                { dict -> CB 57 67 }
 { X) add, }                     { dict -> FB }
 { 57 b,X) add, }                { dict -> EB 57 }
@@ -37,6 +46,7 @@ hex   S" tester.fth" included   ?stack
 
 { A dec, }                      { dict -> 4A }
 { 57 b) dec, }                  { dict -> 3A 57 }
+{ 57 b/w) dec, }                { dict -> 3A 57 }
 { 5767 w) dec, }                { dict -> 72 5A 57 67 }
 { X) dec, }                     { dict -> 7A }
 { 57 b,X) dec, }                { dict -> 6A 57 }
@@ -55,6 +65,7 @@ hex   S" tester.fth" included   ?stack
 
 { 57 # lda, }                   { dict -> A6 57 }
 { 57 b) lda, }                  { dict -> B6 57 }
+{ 57 b/w) lda, }                { dict -> B6 57 }
 { 5767 w) lda, }                { dict -> C6 57 67 }
 { X) lda, }                     { dict -> F6 }
 { 57 b,X) lda, }                { dict -> E6 57 }
@@ -70,6 +81,7 @@ hex   S" tester.fth" included   ?stack
 { 57 b),Y) lda, }               { dict -> 91 D6 57 }
 
 { 57 b) sta, }                  { dict -> B7 57 }
+{ 57 b/w) sta, }                { dict -> B7 57 }
 { 5767 w) sta, }                { dict -> C7 57 67 }
 { X) sta, }                     { dict -> F7 }
 { 57 b,X) sta, }                { dict -> E7 57 }
@@ -86,6 +98,7 @@ hex   S" tester.fth" included   ?stack
 
 { 5767 # ldx, }                 { dict -> AE 57 67 }
 { 57 b) ldx, }                  { dict -> BE 57 }
+{ 57 b/w) ldx, }                { dict -> BE 57 }
 { 5767 w) ldx, }                { dict -> CE 57 67 }
 { X) ldx, }                     { dict -> FE }
 { 57 b,X) ldx, }                { dict -> EE 57 }
@@ -97,6 +110,7 @@ hex   S" tester.fth" included   ?stack
 { 5767 w),X) ldx, }             { dict -> 72 DE 57 67 }
 
 { 57 b) stx, }                  { dict -> BF 57 }
+{ 57 b/w) stx, }                { dict -> BF 57 }
 { 5767 w) stx, }                { dict -> CF 57 67 }
 { X) sty, }                     { dict -> FF }
 { 57 b,X) sty, }                { dict -> EF 57 }
@@ -109,6 +123,7 @@ hex   S" tester.fth" included   ?stack
 
 { 5767 # ldy, }                 { dict -> 90 AE 57 67 }
 { 57 b) ldy, }                  { dict -> 90 BE 57 }
+{ 57 b/w) ldy, }                { dict -> 90 BE 57 }
 { 5767 w) ldy, }                { dict -> 90 CE 57 67 }
 { Y) ldy, }                     { dict -> 90 FE }
 { 57 b,Y) ldy, }                { dict -> 90 EE 57 }
@@ -118,6 +133,7 @@ hex   S" tester.fth" included   ?stack
 { 57 b),Y) ldy, }               { dict -> 91 DE 57 }
 
 { 57 b) sty, }                  { dict -> 90 BF 57 }
+{ 57 b/w) sty, }                { dict -> 90 BF 57 }
 { 5767 w) sty, }                { dict -> 90 CF 57 67 }
 { Y) stx, }                     { dict -> 90 FF }
 { 57 b,Y) stx, }                { dict -> 90 EF 57 }
@@ -127,6 +143,7 @@ hex   S" tester.fth" included   ?stack
 { 57 b),Y) stx, }               { dict -> 91 DF 57 }
 
 { 57 b) Y sti, }                { dict -> 90 BF 57 }
+{ 57 b/w) Y sti, }              { dict -> 90 BF 57 }
 { 5767 w) Y sti, }              { dict -> 90 CF 57 67 }
 { Y) X sti, }                   { dict -> 90 FF }
 { 57 b,Y) X sti, }              { dict -> 90 EF 57 }
@@ -141,6 +158,7 @@ hex   S" tester.fth" included   ?stack
 { mlx, }                        { dict -> 42 }
 { mly, }                        { dict -> 90 42 }
 
+{ 57 b/w) jmp, }                { dict -> 00CC 00 57 }
 { 5767 w) jmp, }                { dict -> 00CC 57 67 }
 { X) jmp, }                     { dict -> FC }
 { 57 b,X) jmp, }                { dict -> EC 57 }
@@ -183,6 +201,7 @@ hex   S" tester.fth" included   ?stack
 { where @ & lo ?jr, }           { dict -> 25 FE }
 { where @ & vs ?jr, }           { dict -> 29 FE }
 
+{ 57 b/w) cal, }                { dict -> CD 00 57 }
 { 5767 w) cal, }                { dict -> CD 57 67 }
 { X) cal, }                     { dict -> FD }
 { 57 b,X) cal, }                { dict -> ED 57 }
@@ -225,6 +244,7 @@ hex   S" tester.fth" included   ?stack
 
 { 5767 # cpx, }                 { dict -> A3 57 67 }
 { 57 b) cpx, }                  { dict -> B3 57 }
+{ 57 b/w) cpx, }                { dict -> B3 57 }
 { 5767 w) cpx, }                { dict -> C3 57 67 }
 { Y) cpx, }                     { dict -> 90 F3 }
 { 57 b,Y) cpx, }                { dict -> 90 E3 57 }
@@ -236,6 +256,7 @@ hex   S" tester.fth" included   ?stack
 
 { A pop, }                      { dict -> 84 }
 { C pop, }                      { dict -> 86 }
+{ 57 b/w) pop, }                { dict -> 32 00 57 }
 { 5767 w) pop, }                { dict -> 32 57 67 }
 
 { X pop, }                      { dict -> 85 }
@@ -249,17 +270,24 @@ hex   S" tester.fth" included   ?stack
 { X psh, }                      { dict -> 89 }
 { Y psh, }                      { dict -> 90 89 }
 
+{ 67 b/w) 57 # mov, }           { dict -> 35 57 00 67 }
 { 1543 w) 57 # mov, }           { dict -> 35 57 15 43 }
 { 57 b) 67 b) mov, }            { dict -> 45 67 57 }
+{ 57 b/w) 67 b/w) mov, }        { dict -> 45 67 57 }
+{ 57 b/w) 1543 w) mov, }        { dict -> 55 15 43 00 57 }
+\ { 1543 w) 57 b/w) mov, }        { dict -> 55 00 57 15 43 } ( FIXME )
 { 1543 w) 5767 w) mov, }        { dict -> 55 57 67 15 43 }
 
+{ 57 b/w) 2 ccm, }              { dict -> 90 15 00 57 }
 { 5767 w) 2 ccm, }              { dict -> 90 15 57 67 }
 
+{ where @ & 57 b/w) 2 tjf, }    { dict -> 72 05 00 57 FB }
 { where @ & 1543 w) 2 tjf, }    { dict -> 72 05 15 43 FB }
 { forward 1543 w) 2 tjf, nop, resolve }
                                 { dict -> 72 05 15 43 01 9D }
 
 { 1543 # adx, }                 { dict -> 1C 15 43 }
+{ 57 b/w) adx, }                { dict -> 72 BB 00 57 }
 { 1543 w) adx, }                { dict -> 72 BB 15 43 }
 { 57 b,S) adx, }                { dict -> 72 FB 57 }
 { 1543 # ady, }                 { dict -> 72 A9 15 43 }
