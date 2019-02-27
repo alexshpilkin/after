@@ -3,8 +3,8 @@
 : label    create ;
 : ;does:   postpone does> ; immediate
 
-label (brand   ," Quart ANS shim $Format:git-%h$"
-(brand   here over -   2constant brand
+here   ," After ANS shim $Format:git-%h$"   here over -
+2constant brand
 
 : push  postpone >r ; immediate
 : pop   postpone r> ; immediate
