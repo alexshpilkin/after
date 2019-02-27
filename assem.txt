@@ -119,23 +119,25 @@ This is simply my personal preference. The correspondence is:
   ULT        LO  lower            /
   V          VS  overflow set
 
-Commands
---------
+Instructions
+------------
 
 [Note 3]
-    The mnemonics are adjusted to three characters.
+    The mnemonics of BREAK, CALL, CP, DIVW, HALT, IRET, JP, OR,
+    PUSH, RLWA, RRWA, SWAP, and TRAP are adjusted to three
+    characters.
 
 [Note A]
-    The binary operations (ADC, ADD, AND, BCP, CMP,
+    The binary instructions (ADC, ADD, AND, BCP, CMP,
     ORR [Note 3], SBC, SUB, XOR) are written without the
     destination argument, which is always A.
 
 [Note B]
     The bit modification (CCM, CPL, RES, SET) and test (TJF,
-    TJT) operations have the starting B in the mnemonic removed.
-    The vendor CPL is therefore renamed to NOT.  Additionally,
-    the bit number is written as a simple numeric argument and
-    not an immediate operand.
+    TJT) instructions have the starting B in the mnemonic
+    removed.  The vendor CPL is therefore renamed to NOT.
+    Additionally, the bit number is written as a simple numeric
+    argument and not an immediate operand.
 
 [Note C]
     The conditional jumps (JRxx) are written with a single
@@ -146,11 +148,11 @@ Commands
     operand order that more closely matches their encodings.
 
 [Note L]
-    The all-purpose LD/LDW operations are split into several
-    mnemonics due to their highly irregular encodings.
-    Transfers between registers are notated as TFR, loads
-    from A, X, and Y respectively as LDA, LDX, and LDY, stores
-    as STA, STX, and STY.  For the same reason, the wide
+    The all-purpose instructions LD and LDW are split into
+    several mnemonics due to their highly irregular encodings.
+    Transfers between registers are denoted by TFR, loads
+    from A, X, and Y by respectively LDA, LDX, and LDY, stores
+    by STA, STX, and STY.  For the same reason, the wide
     arithmetic operations ADDW, CPW, DIV, MUL, and SUBW are
     split into ADX, ADY, ADS; CPX, CPY; DVX, DVY; MLX, MLY;
     and SBX, SBY.  See, however, [Note W].
@@ -226,7 +228,7 @@ The complete operation syntax correspondence is as follows:
   JP dst                       dst JMP,  [3     M   ]
   JPF dst                          ---
   JRA dst                      dst JMP,  [       R  ]
-  JRxx dst                     dst ?JR,  [   C      ]
+  JRxx dst                  dst cc ?JR,  [   C      ]
   LD reg, reg              reg,reg TFR,  [     L    ]
   LD A, src                    src LDA,  [     L    ]
   LD dst, A                    dst STA,  [     L    ]

@@ -219,7 +219,7 @@ label (adi/sbi)   ( precode; high nibble of opcode )
   ['] w, operand, ;
 ' adx, ' ady, x/y adi,   ' sbx, ' sby, x/y sbi,
 
-: mov, ( o1 o2 -- )   b/w>b ( be optimistic )
+: mov, ( o1 o2 -- )   b/w>b ( FIXME be optimistic )
   dup b) = if   45 b, ['] die operand,   b/w>b   dup b) <> ?m
     ['] die operand,   exit then
   dup w) = if   55 b, ['] die operand,   b/w>w   dup w) <> ?m
