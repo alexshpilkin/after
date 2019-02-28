@@ -348,4 +348,20 @@ hex   S" tester.fth" included   ?stack
 { 1543 # Y adi, }               { dict -> 72 A9 15 43 }
 { 1543 # Y sbi, }               { dict -> 72 A2 15 43 }
 
+{ brk, }                        { dict -> 8B }
+{ ccf, }                        { dict -> 8C }
+{ hlt, }                        { dict -> 8E }
+{ irt, }                        { dict -> 80 }
+{ nop, }                        { dict -> 9D }
+{ rcf, }                        { dict -> 98 }
+{ ret, }                        { dict -> 81 }
+\ { rtf, }                        { dict -> 87 } ( FIXME )
+{ rim, }                        { dict -> 9A }
+{ rvf, }                        { dict -> 9C }
+{ scf, }                        { dict -> 99 }
+{ sim, }                        { dict -> 9B }
+{ trp, }                        { dict -> 83 }
+{ wfe, }                        { dict -> 72 8F }
+{ wfi, }                        { dict -> 8F }
+
 ?stack bye
