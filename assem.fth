@@ -153,7 +153,7 @@ label (ldy/styx)   ( precode; part[NB!] of opcode )
 : cpx, ( o -- )   b/w>b dup   dup X < if (ldx/stxy) else
   (ldy/styx) then   encode 03 or b,   ['] w, operand, ;
 : cpy, ( o -- )   b/w>b dup   dup b,S) = ?m   dup X < if
-  (ldx/stxy) else (ldy/styx) then   encode 03 or b,
+  (ldy/styx) else (ldx/stxy) then   encode 03 or b,
   ['] w, operand, ;
 ' cpx, ' cpy, x/y cpi,
 
