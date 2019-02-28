@@ -256,7 +256,7 @@ label (adi/sbi)   ( precode; high nibble of opcode )
   8C nullary ccf,  ( 8D CALLF      )
   8E nullary hlt,    8F nullary wfi,
 
-  72 8E 2nullary wfe,
+  72 8F 2nullary wfe,
 
 ( 90 PDY        )  ( 91 PIX        )
 ( 92 PIY        )  ( 93 TFR XY,YX  )
