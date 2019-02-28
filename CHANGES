@@ -4,5 +4,6 @@
 
 ### Added
 
+* Simple virtual machine in C for debugging.
 * Postfix assembler for STM8 with some documentation.
 * Monitor to inspect and manipulate a live STM8-DISCOVERY from the host.
