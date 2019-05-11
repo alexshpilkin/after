@@ -4,19 +4,19 @@ base save hex
 : w!   over 256/ over b! 1+ b! ;
 ( b,   required )
 : w,   dup 256/ b, b, ;
-: j,   where @ 1+ -   dup b,
-  -80 7F between 0= ?abort" jump offset? " ;
+: r,   where @ 1+ -   dup b,   ( FIXME rename? )
+  -80 7F between 0= ?abort" branch? " ; 
 
 : ?b   ?abort" bit number? " ;
 : ?m   ?abort" addressing mode? " ;
 : ?p   ?abort" register pair? " ;
 : ?a   ?abort" address? " ;
-: ?r   ?abort" offset? " ;
+: ?o   ?abort" offset? " ;
 
 : +mode   dup cell + swap constant ;
 
 0 ( layout of a table for ENCODE or OPERAND, )
-  +mode A  +mode #   +mode b)    +mode w)    +mode b))    +mode w))    +mode b,S)  +mode &
+  +mode A  +mode #   +mode b)    +mode w)    +mode b))    +mode w))    +mode b,S)
   +mode X  +mode X)  +mode b,X)  +mode w,X)  +mode b),X)  +mode w),X)
   +mode Y  +mode Y)  +mode b,Y)  +mode w,Y)  +mode b),Y)
   +mode C
@@ -29,7 +29,7 @@ drop
 : amode ( 'bname 'wname "name" -- ) ( n -- o )   push push
   : postpone dup FF postpone literal postpone u<= postpone if
   pop compile,   postpone exit postpone then   postpone dup
-  FFFF postpone literal postpone u> postpone ?r   pop compile,
+  FFFF postpone literal postpone u> postpone ?o   pop compile,
   postpone ; ;
 : rmode ( 'bname 'wname "name" -- ) ( u -- o )   push push
   : postpone dup -80 postpone literal 7F postpone literal
@@ -56,15 +56,15 @@ drop
 ' b),X) ' b),Y) x/y b),I)   '  ),X) '  ),Y) x/y ),I)
 
 : return   ( -- dest )     where @ ;
-( backward ( dest -- o )   & constant backward
-: forward  ( -- orig o )   where @ dup & ;
+: backward ( dest -- o )   ;
+: forward  ( -- orig o )   where @ dup ;
 ( FIXME inspects the opcode -- only use of ub@ )
 : resolve  ( orig -- )   dup ub@ 72 = if 5 + else 2 + then
   where @ over -   dup -80 7F between 0= ?abort" resolve? "
   swap 1- b! ;
 
 label (operand)   ( semantics of operand )
-  ' relax , ' die   , ' b, , ' w, , ' b, , ' w, , ' b, , ' j, ,
+  ' relax , ' die   , ' b, , ' w, , ' b, , ' w, , ' b, ,
   ' relax , ' relax , ' b, , ' w, , ' b, , ' w, ,
   ' relax , ' relax , ' b, , ' w, , ' b, ,
   ' relax ,
@@ -76,7 +76,7 @@ label (operand)   ( semantics of operand )
   dup if b, else drop then ;
 
 label (binary)   ( precode; high nibble )
-  FFFF , 00A0 , 00B0 , 00C0 , 92C0 , 72C0 , 0010 , FFFF ,
+  FFFF , 00A0 , 00B0 , 00C0 , 92C0 , 72C0 , 0010 ,
   FFFF , 00F0 , 00E0 , 00D0 , 92D0 , 72D0 ,
   FFFF , 90F0 , 90E0 , 90D0 , 91D0 ,
   FFFF ,
@@ -89,11 +89,16 @@ label (binary)   ( precode; high nibble )
   08 binary xor,  09 binary adc,  0A binary orr,  0B binary add,
  ( C        JMP) ( D        CAL) ( E        LDW) ( F        STW)
 
-label (cal/jmp)   ( precode; high nibble of opcode )
-  FFFF , FFFF , FFFF , 00C0 , 92C0 , 72C0 , FFFF , 00A0 ,
+label (jump)   ( precode; high nibble of opcode )
+  FFFF , FFFF , FFFF , 00C0 , 92C0 , 72C0 , FFFF ,
   FFFF , 00F0 , 00E0 , 00D0 , 92D0 , 72D0 ,
   FFFF , 90F0 , 90E0 , 90D0 , 91D0 ,
   FFFF ,
+
+: jmp, ( o -- )   b/w>w dup   (jump) encode 0C or b,
+  ['] die operand, ;
+: jsr, ( o -- )   b/w>w dup   (jump) encode 0D or b,
+  ['] die operand, ;
 
 ( -- cc )   ( jump opcode )
 20 constant al  21 constant nv  22 constant hi  23 constant ls
@@ -103,18 +108,15 @@ label (cal/jmp)   ( precode; high nibble of opcode )
 2C constant gt  2D constant le  2E constant ge  2F constant lt
 
 : inv ( cc -- cc )   1 xor ;
-
-: cal, ( o -- )   b/w>w dup   (cal/jmp) encode 0D or b,
-  ['] die operand, ;
-: jmp, ( o -- )   b/w>w dup   dup & = if drop 20 ( JAL ) else
-  (cal/jmp) encode 0C or then b,   ['] die operand, ;
-: ?jr, ( o cc -- )   over & <> ?m   b,   ['] die operand, ;
+: ?br, ( a cc -- )   b, r, ;
+: bra, ( a -- )   al ?br, ;
+: bsr, ( a -- )   AD b, r, ;
 
 : begin,  ( -- dest )        return ;
 : again,  ( dest -- )        backward jmp, ;
-: until,  ( dest cc -- )     inv push   backward pop ?jr, ;
+: until,  ( dest cc -- )     inv push   backward pop ?br, ;
 : ahead,  ( -- orig )        forward jmp, ;
-: if,     ( cc -- orig )     inv push   forward pop ?jr, ;
+: if,     ( cc -- orig )     inv push   forward pop ?br, ;
 : else,   ( orig -- orig )   forward jmp,   swap resolve ;
 : then,   ( orig -- )        resolve ;
 : while,  ( cc dest -- orig dest )   if, swap ;
@@ -127,13 +129,13 @@ label (cal/jmp)   ( precode; high nibble of opcode )
   ['] die operand, ;
 
 label (ldx/stxy)   ( precode; high nibble of opcode )
-  FFFF , 00A0 , 00B0 , 00C0 , 92C0 , 72C0 , 0010 , FFFF ,
+  FFFF , 00A0 , 00B0 , 00C0 , 92C0 , 72C0 , 0010 ,
   FFFF , 00F0 , 00E0 , 00D0 , 92D0 , 72D0 ,
   FFFF , FFFF , FFFF , FFFF , FFFF ,
   FFFF ,
 
 label (ldy/styx)   ( precode; part[NB!] of opcode )
-  FFFF , 90A0 , 90B0 , 90C0 , 91C0 , FFFF , 0018 , FFFF ,
+  FFFF , 90A0 , 90B0 , 90C0 , 91C0 , FFFF , 0018 ,
   FFFF , FFFF , FFFF , FFFF , FFFF , FFFF ,
   FFFF , 90F0 , 90E0 , 90D0 , 91D0 ,
   FFFF ,
@@ -172,7 +174,7 @@ label (ldy/styx)   ( precode; part[NB!] of opcode )
 ( FIXME exg a, mem )
 
 label (unary)   ( precode; high nibble of opcode )
-  0040 , FFFF , 0030 , 7250 , 9230 , 7230 , 0000 , FFFF ,
+  0040 , FFFF , 0030 , 7250 , 9230 , 7230 , 0000 ,
   0050 , 0070 , 0060 , 7240 , 9260 , 7260 ,
   9050 , 9070 , 9060 , 9040 , 9160 ,
   FFFF ,
@@ -192,7 +194,7 @@ label (unary)   ( precode; high nibble of opcode )
   01 rotate rra,  02 rotate rla,
 
 label (psh/pop)   ( precode; part[NB!] of opcode )
-  0080 , 0043 , FFFF , 0033 , FFFF , FFFF , FFFF , FFFF ,
+  0080 , 0043 , FFFF , 0033 , FFFF , FFFF , FFFF ,
   0081 , FFFF , FFFF , FFFF , FFFF , FFFF ,
   9081 , FFFF , FFFF , FFFF , FFFF ,
   0082 ,
@@ -203,7 +205,7 @@ label (psh/pop)   ( precode; part[NB!] of opcode )
   else   (psh/pop) encode 04 or   then b,   ['] b, operand, ;
 
 label (adi/sbi)   ( precode; high nibble of opcode )
-  FFFF , 72A0 , FFFF , 72B0 , FFFF , FFFF , 72F0 , FFFF ,
+  FFFF , 72A0 , FFFF , 72B0 , FFFF , FFFF , 72F0 ,
   FFFF , FFFF , FFFF , FFFF , FFFF , FFFF ,
   FFFF , FFFF , FFFF , FFFF , FFFF ,
   FFFF ,
@@ -234,11 +236,11 @@ label (adi/sbi)   ( precode; high nibble of opcode )
   90 10 bitmod cpl,   90 11 bitmod ccm,
   72 10 bitmod set,   72 11 bitmod res,
 
-: bitjmp ( n "name" -- ) ( j o bit -- )   create , ;does:
+: bitjmp ( n "name" -- ) ( a o bit -- )   create , ;does:
   72 b,   @ swap 7 and 2* or b,   b/w>w   dup w) <> ?m
-  ['] die operand,   dup & <> ?m   ['] die operand, ;
+  ['] die operand,   r, ;
 
-  00 bitjmp tjt,   01 bitjmp tjf,
+  00 bitjmp bbs,   01 bitjmp bbc,
 
 : nullary    create ,   ;does: @ b, ;
 : 2nullary   create , , ;does: dup cell + @ b, @ b, ;

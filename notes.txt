@@ -1,7 +1,7 @@
 Opcode map
 ==========
 
-                                         BINARY   BIT/                  UNARY   BCH     NULLARY
+                                             BINARY   BIT/                  UNARY   BCH     NULLARY
     BIT/BIT/    ADW/    ADW/                ADW/
              1x      Ax      Bx  Cx  Dx  Ex      Fx        0x  3x  4x  5x  6x  7x    2x    8x    9x
 x0  cpl/set/sub     sub SBX/sub sub sub sub SBX/sub   tjt/neg neg neg neg neg neg   jal   irt   pdi
@@ -9,7 +9,7 @@ x1  ccm/res/cmp     cmp     cmp cmp cmp cmp     cmp   tjf(rrw|exg|exg|exg|exg)  
 x2  cpl/set/sbc SBY/sbc SBY/sbc sbc sbc sbc SBY/sbc   tjt(rlw|POP|MUL)   (DIV|PWS)  jhi  (INT)  piy
 x3  ccm/res(cpw)   (cpw)   (cpw|cpw|cpw|cpw)   (cpw)  tjf/not not not not not not   jls   trp  (LDW)
 x4  cpl/set/and     and     and and and and     and   tjt/srl srl srl srl srl srl   jhs  (POP) (STX)
-x5  ccm/res/bcp     bcp     bcp bcp bcp bcp     bcp   tjf/               (DIV)      jlo  (POP) (STA)
+x5  ccm/res/bcp     bcp     bcp bcp bcp bcp     bcp   tjf/   ?MOV?       (DIV)      jlo  (POP) (STA)
 x6  cpl/set(LDW)    lda     lda lda lda lda     lda   tjt/rrc rrc rrc rrc rrc rrc   jne  (POP) (LDX)
 x7  ccm/res/        STA     sta sta sta sta     sta   tjf/sra sra sra sra sra sra   jeq   rtf  (LDA)
 x8  cpl/set/xor     xor     xor xor xor xor     xor   tjt/sll sll sll sll sll sll   jvc  (PSH)  rcf

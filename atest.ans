@@ -187,54 +187,54 @@ hex   S" tester.fth" included   ?stack
 { X dvi, }                      { dict -> 62 }
 { Y dvi, }                      { dict -> 90 62 }
 
-{ 57 b/w) cal, }                { dict -> CD 00 57 }
+{ 57 b/w) jsr, }                { dict -> CD 00 57 }
 { 57 b/w) jmp, }                { dict -> 0CC 00 57 }
 
-{ 57 b/w) cal, }                { dict -> CD 00 57 }
-{ 5767 w) cal, }                { dict -> CD 57 67 }
-{ X) cal, }                     { dict -> FD }
-{ 57 b,X) cal, }                { dict -> ED 57 }
-{ 5767 w,X) cal, }              { dict -> DD 57 67 }
-{ Y) cal, }                     { dict -> 90 FD }
-{ 57 b,Y) cal, }                { dict -> 90 ED 57 }
-{ 5767 w,Y) cal, }              { dict -> 90 DD 57 67 }
-{ 57 b)) cal, }                 { dict -> 92 CD 57 }
-{ 5767 w)) cal, }               { dict -> 72 CD 57 67 }
-{ 57 b),X) cal, }               { dict -> 92 DD 57 }
-{ 5767 w),X) cal, }             { dict -> 72 DD 57 67 }
-{ 57 b),Y) cal, }               { dict -> 91 DD 57 }
+{ 57 b/w) jsr, }                { dict -> CD 00 57 }
+{ 5767 w) jsr, }                { dict -> CD 57 67 }
+{ X) jsr, }                     { dict -> FD }
+{ 57 b,X) jsr, }                { dict -> ED 57 }
+{ 5767 w,X) jsr, }              { dict -> DD 57 67 }
+{ Y) jsr, }                     { dict -> 90 FD }
+{ 57 b,Y) jsr, }                { dict -> 90 ED 57 }
+{ 5767 w,Y) jsr, }              { dict -> 90 DD 57 67 }
+{ 57 b)) jsr, }                 { dict -> 92 CD 57 }
+{ 5767 w)) jsr, }               { dict -> 72 CD 57 67 }
+{ 57 b),X) jsr, }               { dict -> 92 DD 57 }
+{ 5767 w),X) jsr, }             { dict -> 72 DD 57 67 }
+{ 57 b),Y) jsr, }               { dict -> 91 DD 57 }
 
-{ return backward cal, }        { dict -> AD FE }
-{ forward cal, resolve }        { dict -> AD 00 }
+{ return backward bsr, }        { dict -> AD FE }
+{ forward bsr, resolve }        { dict -> AD 00 }
 
-{ return backward jmp, }        { dict -> 20 FE }
-{ forward jmp, resolve }        { dict -> 20 00 }
+{ return backward bra, }        { dict -> 20 FE }
+{ forward bra, resolve }        { dict -> 20 00 }
 
-{ where @ & cs ?jr, }           { dict -> 25 FE }
-{ where @ & eq ?jr, }           { dict -> 27 FE }
-{ where @ & nv ?jr, }           { dict -> 21 FE }
+{ where @ cs ?br, }             { dict -> 25 FE }
+{ where @ eq ?br, }             { dict -> 27 FE }
+{ where @ nv ?br, }             { dict -> 21 FE }
 ( FIXME half-carry                90 29 FE )
 ( FIXME interrupt high            90 2F FE )
 ( FIXME interrupt low             90 2E FE )
 ( FIXME interrupt mask            90 2D FE )
-{ where @ & mi ?jr, }           { dict -> 2B FE }
-{ where @ & cc ?jr, }           { dict -> 24 FE }
-{ where @ & ne ?jr, }           { dict -> 26 FE }
+{ where @ mi ?br, }             { dict -> 2B FE }
+{ where @ cc ?br, }             { dict -> 24 FE }
+{ where @ ne ?br, }             { dict -> 26 FE }
 ( FIXME not half-carry            90 28 FE )
 ( FIXME not interrupt mask        90 2C FE )
-{ where @ & vc ?jr, }           { dict -> 28 FE }
-{ where @ & pl ?jr, }           { dict -> 2A FE }
-{ where @ & ge ?jr, }           { dict -> 2E FE }
-{ where @ & gt ?jr, }           { dict -> 2C FE }
-{ where @ & le ?jr, }           { dict -> 2D FE }
-{ where @ & lt ?jr, }           { dict -> 2F FE }
-{ where @ & al ?jr, }           { dict -> 20 FE }
-{ where @ & hs ?jr, }           { dict -> 24 FE }
-{ where @ & hi ?jr, }           { dict -> 22 FE }
-{ where @ & ls ?jr, }           { dict -> 23 FE }
-{ where @ & cs ?jr, }           { dict -> 25 FE }
-{ where @ & lo ?jr, }           { dict -> 25 FE }
-{ where @ & vs ?jr, }           { dict -> 29 FE }
+{ where @ vc ?br, }             { dict -> 28 FE }
+{ where @ pl ?br, }             { dict -> 2A FE }
+{ where @ ge ?br, }             { dict -> 2E FE }
+{ where @ gt ?br, }             { dict -> 2C FE }
+{ where @ le ?br, }             { dict -> 2D FE }
+{ where @ lt ?br, }             { dict -> 2F FE }
+{ where @ al ?br, }             { dict -> 20 FE }
+{ where @ hs ?br, }             { dict -> 24 FE }
+{ where @ hi ?br, }             { dict -> 22 FE }
+{ where @ ls ?br, }             { dict -> 23 FE }
+{ where @ cs ?br, }             { dict -> 25 FE }
+{ where @ lo ?br, }             { dict -> 25 FE }
+{ where @ vs ?br, }             { dict -> 29 FE }
 
 { XL,A tfr, }                   { dict -> 97 }
 { A,XL tfr, }                   { dict -> 9F }
@@ -317,12 +317,12 @@ hex   S" tester.fth" included   ?stack
 { 57 b/w) 2 ccm, }              { dict -> 90 15 00 57 }
 { 5767 w) 2 ccm, }              { dict -> 90 15 57 67 }
 
-{ where @ & 57 b/w) 2 tjf, }    { dict -> 72 05 00 57 FB }
-{ where @ & 57 b/w) 2 tjt, }    { dict -> 72 04 00 57 FB }
+{ where @ 57 b/w) 2 bbc, }      { dict -> 72 05 00 57 FB }
+{ where @ 57 b/w) 2 bbs, }      { dict -> 72 04 00 57 FB }
 
-{ where @ & 57 b/w) 2 tjf, }    { dict -> 72 05 00 57 FB }
-{ where @ & 1543 w) 2 tjf, }    { dict -> 72 05 15 43 FB }
-{ forward 1543 w) 2 tjf, nop, resolve }
+{ where @ 57 b/w) 2 bbc, }      { dict -> 72 05 00 57 FB }
+{ where @ 1543 w) 2 bbc, }      { dict -> 72 05 15 43 FB }
+{ forward 1543 w) 2 bbc, nop, resolve }
                                 { dict -> 72 05 15 43 01 9D }
 
 { 1543 # adx, }                 { dict -> 1C 15 43 }

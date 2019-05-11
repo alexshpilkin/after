@@ -24,22 +24,22 @@ drop
 : entry ( a -- )   where @ <> ?abort" entry? " ;
 
 where @ constant recvw
-  forward cal,   ( FALLTHROUGH )        ( rx high low   )
+  forward bsr,   ( FALLTHROUGH )        ( rx high low   )
 where @ constant recvb   resolve
-  where @ & SR ) 5 tjf,   DR ) lda,     ( rx byte in A  )
+  where @ SR ) 5 bbc,   DR ) lda,       ( rx byte in A  )
   SR ) 5 res,                           ( clear buffer  )
   ( FALLTHROUGH )                       ( echo, shift   )
 where @ constant sendb
-  where @ & SR ) 7 tjf,   DR ) sta,     ( tx byte in A  )
+  where @ SR ) 7 bbc,   DR ) sta,       ( tx byte in A  )
   x rla,   ret,                         ( shift into X  )
 
 'read entry
-  recvw & cal,   x) lda,                ( rx addr, read )
-  sendb & cal,   forward jmp,           ( tx byte, loop )
+  recvw bsr,   x) lda,                  ( rx addr, read )
+  sendb bsr,   forward bra,             ( tx byte, loop )
 
 'write entry
-  recvb & cal,   recvw & cal,           ( rx byte addr  )
-  x) sta,   forward jmp,                ( write, loop   )
+  recvb bsr,   recvw bsr,               ( rx byte addr  )
+  x) sta,   forward bra,                ( write, loop   )
 
 where @ 0 !vector                       (  ENTRY POINT  )
 
@@ -49,6 +49,6 @@ CR2  ) 0C # mov,                        ( rx/tx enable  )
 
 'loop entry ( write> ) resolve ( read> ) resolve
 
-recvw & cal,   x) jmp,                  ( rx addr & jmp )
+recvw bsr,   x) jmp,                    ( rx addr & jmp )
 
 ihex bye

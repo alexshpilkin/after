@@ -19,7 +19,7 @@ the current encoding address, B, to encode a byte, and
 optionally UB @ and B! to write a byte if forward branches are used.  The
 latter two words   .  The
 assembler will define a W, that follows the processor byte
-order (big endian) and truncates as well.
+order (big endian) as well.
 
 Error checking
 --------------
@@ -27,32 +27,25 @@ Error checking
 There is only limited error checking.  The assembler is free to
 encode nonsense or crash if you give it arguments of the wrong
 type [Arguments], but not otherwise.  Additionally, if you use
-the unchecked addressing modes [Addressing modes], any
-extraneous bits in an address or offset will be silently
-discarded.  Extraneous bits in an immediate or a bit number are
-always discarded.
+unchecked addressing modes, any extraneous bits in an address or
+offset will be silently discarded.  Extraneous bits in an
+immediate or a bit number are always discarded.
 
 Arguments
 ---------
 
-Arguments to operations come in four types: operands, register
-pairs, condition codes and bit numbers.
-
-
-
-Addressing modes
-----------------
-
-The correspondence between vendor and Forth addressing modes is
-completely regular.  The only apparent exception actually has to
-do with instruction syntax: a bit number is considered a simple
-number, not an immediate [Note B].  Also, because the STM8
-instruction set encodes targets of absolute jumps and calls as
-addresses, not immediates, the call syntax appears to have one
-more indirection than it actually does.  A final limitation of
-this assembler is that 24-bit extended addressing modes are not
-supported, because this would require manipulating stack entries
-of more than 16 bits.
+Arguments to operations come in five types: operands `o`, branch
+addresses `a`, register pairs `rp`, condition codes `cc` and bit
+positions `pos`.  The correspondence between vendor and Forth
+addressing modes is completely regular, but care must be taken
+to distinguish between absolute and branch addresses
+[Note FIXME] and between bit positions and immediates [Note B].
+Also, because the STM8 instruction set encodes targets of
+absolute jumps and calls as addresses, not immediates, the call
+syntax appears to have one more indirection than it actually
+does.  A final limitation of this assembler is that 24-bit
+extended addressing modes are not supported, because this would
+require manipulating stack entries of more than 16 bits.
 
 Each addressing mode word creates an operand on the stack,
 possibly consuming a cell in the process.  For modes that encode
@@ -65,10 +58,10 @@ are always unchecked, because the implied signedness of an
 immediate depends on programmer intent.  (Note that a given
 instruction only ever admits one immediate size.)
 
+  ----------------  --------------  -----------------  --------
   Vendor                     Forth  Reference          Checked?
   ----------------  --------------  -----------------  --------
   #imm                       imm #  #      ( n -- o )  no
-  rel                        rel &  &      ( a -- o )  yes
   shortmem             shortmem b)  b)     ( u -- o )  no
   longmem               longmem w)  w)     ( u -- o )  no
   mem                        mem )  )      ( u -- o )  yes
@@ -95,11 +88,12 @@ instruction only ever admits one immediate size.)
 Condition codes
 ---------------
 
-The condition codes are completely renamed in line with the ARM.
+The condition codes are completely renamed in line with ARM.
 This is simply my personal preference. The correspondence is:
 
+  ------  -----  ------------------------------
   Vendor  Forth  Meaning
-  ------  -----  -------
+  ------  -----  ------------------------------
   C          CS  carry set
   EQ         EQ  equal
   F          NV  never
@@ -118,14 +112,16 @@ This is simply my personal preference. The correspondence is:
   ULE        LS  lower or same    |
   ULT        LO  lower            /
   V          VS  overflow set
+  ------  -----  ------------------------------
 
 Instructions
 ------------
 
+FIXME branch vs jump
+
 [Note 3]
-    The mnemonics of BREAK, CALL, CP, DIVW, HALT, IRET, JP, OR,
-    PUSH, RLWA, RRWA, SWAP, and TRAP are adjusted to three
-    characters.
+    The mnemonics of BREAK, CP, DIVW, HALT, IRET, JP, OR, PUSH,
+    RLWA, RRWA, SWAP, and TRAP are adjusted to three characters.
 
 [Note A]
     The binary instructions (ADC, ADD, AND, BCP, CMP,
@@ -133,18 +129,16 @@ Instructions
     destination argument, which is always A.
 
 [Note B]
-    The bit modification (CCM, CPL, RES, SET) and test (TJF,
-    TJT) instructions have the starting B in the mnemonic
-    removed.  The vendor CPL is therefore renamed to NOT.
-    Additionally, the bit number is written as a simple numeric
-    argument and not an immediate operand.
+    The bit modification (CCM, CPL, RES, SET) and test (BBC,
+    BBS) [Note R] instructions have the starting B in the
+    mnemonic removed.  The vendor CPL is thus renamed to NOT.
 
 [Note C]
     The conditional jumps (JRxx) are written with a single
-    mnemonc ?JR and a condition code on the stack.
+    mnemonc ?BR and a condition code on the stack.
 
 [Note J]
-    The bit test operations TJF and TJT [Note B] use a different
+    The bit test operations BBC and BBS [Note R] use a different
     operand order that more closely matches their encodings.
 
 [Note L]
@@ -158,14 +152,15 @@ Instructions
     and SBX, SBY.  See, however, [Note W].
 
 [Note M]
-    The operand of absolute JMP and CAL appears to have one more
-    indirection than it actually does.  See [Addressing modes].
+    The operand of JMP and JSR appears to have one more
+    indirection than it actually does [Arguments].
 
 [Note R]
-    Relative jumps and calls are encoded using respectively JMP
-    and CAL with the relative addressing mode &.  This mode also
-    has to be used with the relative conditional jumps ?JR, TJF
-    and TJT.
+    All control transfers are renamed in a systematic manner:
+    those encoding absolute addresses (JMP, JSR) are jumps and
+    those encoding relative addresses (?BR, BBC, BBS, BRA, BSR)
+    are branches.  These correspond respectively to vendor JP,
+    CALL, JRxx, TJF, TJT, JRA and CALLR.
 
 [Note U]
     The word versions of the unary ALU operations (CLR, DEC,
@@ -200,11 +195,11 @@ The complete operation syntax correspondence is as follows:
   BREAK                            BRK,  [3         ]
   BRES dst, #pos           dst pos RES,  [  B       ]
   BSET dst, #pos           dst pos SET,  [  B       ]
-  BTJF dst, #pos, rel  rel dst pos TJF,  [  B J  R  ]
-  BTJT dst, #pos, rel  rel dst pos TJT,  [  B J  R  ]
-  CALL dst                     dst CAL,  [3     M   ]
+  BTJF dst, #pos, rel  rel dst pos BBC,  [  B J  R  ]
+  BTJT dst, #pos, rel  rel dst pos BBS,  [  B J  R  ]
+  CALL dst                     dst JSR,  [      MR  ]   FIXME
   CALLF dst                        ---
-  CALLR dst                    dst CAL,  [       R  ]
+  CALLR dst                    dst BSR,  [       R  ]
   CCF                              CCF,  [          ]
   CLR dst                      dst CLR,  [          ]
   CLRW dst                     dst CLR,  [        U ]
@@ -225,10 +220,10 @@ The complete operation syntax correspondence is as follows:
   INCW dst                     dst INC,  [        U ]
   INT dst                          ---
   IRET                             IRT,  [3         ]
-  JP dst                       dst JMP,  [3     M   ]
+  JP dst                       dst JMP,  [3     MR  ]
   JPF dst                          ---
-  JRA dst                      dst JMP,  [       R  ]
-  JRxx dst                  dst cc ?JR,  [   C      ]
+  JRA dst                      dst BRA,  [       R  ]
+  JRxx dst                  dst cc ?BR,  [   C   R  ]
   LD reg, reg              reg,reg TFR,  [     L    ]
   LD A, src                    src LDA,  [     L    ]
   LD dst, A                    dst STA,  [     L    ]
@@ -289,12 +284,6 @@ but there are both unstructured and structured words for
 managing control flow using the stack.
 
 The low-level words are:
-
-&               a -- o                                "relative"
-    Turn the absolute address on the stack into an operand for
-    a relative jump or call instruction.  An error is raised
-    during instruction encoding if the signed difference between
-   `a` and the end of the instruction does not fit in a byte.
 
 RETURN          -- dest
     Leave the current encoding address.  A synonym of `HERE` to
