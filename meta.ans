@@ -1,0 +1,40 @@
+S" shim.ans" included   base @ hex
+
+100 constant size
+label buffer   size allot
+variable start   buffer start !
+variable length   0 length !
+
+: accept ( a n -- m )
+  swap dup rot   1 - accept   tuck + 0A swap c!   1 + ;
+
+: discard ( n -- )   dup start +!   length -! ;
+
+: expect ( n -- a m )
+  dup size > ?abort" expect? "
+  start @ buffer - over +   size > if
+    start @ buffer length @ cmove   buffer start !   then
+  begin   dup length @ > while   start @ length @ +
+    size length @ -   accept   length +!   repeat
+  drop start @ length @ ;
+
+( end of shim )
+
+: clip ( a n m -- a+m n-m )   tuck - tor + swap ;
+
+: scan-blanks ( a n -- a+m n-m )   begin   dup while
+  over c@ 20 > while   1 clip   again then then ;
+
+: skip-blanks ( a n -- a+m n-m )   begin   dup while
+  over c@ 20 <= while   1 clip   again then then ;
+
+: blanks ( -- )
+  begin   1 expect   tuck skip-blanks nip -   dup discard
+    0 = until ;
+
+: name ( -- a n )
+  0 push begin   peek 1 + expect   peek clip
+    tuck scan-blanks nip -   dup pop + push   0 = until
+  peek expect drop pop ;
+
+base !

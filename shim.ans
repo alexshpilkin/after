@@ -13,6 +13,8 @@ here   ," After ANS shim $Format:git-%h$"   here over -
 : lose  postpone r> postpone drop ; immediate
 : tor   rot rot ;
 
+: -! ( x a -- )
+  tuck @   swap - swap ! ;
 : +under  ( x y z -- x+z y )
   swap   push + pop ;
 : within  ( x lo hi -- lo<=x<hi )
