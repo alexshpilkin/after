@@ -1,5 +1,13 @@
 S" shim.ans" included   base @ hex
 
+: stack
+  depth dup
+  begin ?dup while  rot push  1-  repeat
+  begin ?dup while  pop dup .  swap 1-  repeat ;
+: (stack)   ." ( " stack ." ) " ;
+
+( shim )
+
 100 constant size
 label buffer   size allot
 variable start   buffer start !
@@ -18,9 +26,35 @@ variable length   0 length !
     size length @ -   accept   length +!   repeat
   drop start @ length @ ;
 
-( end of shim )
-
 : clip ( a n m -- a+m n-m )   tuck - tor + swap ;
+
+: >number ( a n -- a' n' m )
+  0 push   begin   dup 0 > while   over c@
+    dup 30 39 between if   30 - pop 16* + push   else
+    dup 41 5A between if   37 - pop 16* + push   else
+    dup 61 7A between if   57 - pop 16* + push   else
+    drop pop exit   then then then   1 clip   repeat
+  pop ;
+
+: fold ( c -- c' )
+  dup 61 7A between if   20 -   then
+  dup 20 <= if   drop 20   then ;
+
+: collate ( a1 a2 n -- f )
+  push begin
+    peek dup while drop   over c@ fold   over c@ fold   -
+    dup 0 = while drop   swap 1 chars +   swap 1 chars +
+    pop 1 - push   again then then
+  lose nip nip ;
+
+: folded, ( a n -- )
+  begin   dup while   swap dup c@ fold c, 1 chars + swap 1 -
+  repeat   2drop ;
+
+' compile, constant \call,
+' literal  constant \push,
+
+( parser )
 
 : scan-blanks ( a n -- a+m n-m )   begin   dup while
   over c@ 20 > while   1 clip   again then then ;
@@ -35,6 +69,69 @@ variable length   0 length !
 : name ( -- a n )
   0 push begin   peek 1 + expect   peek clip
     tuck scan-blanks nip -   dup pop + push   0 = until
-  peek expect drop pop ;
+  pop 1 + dup expect drop swap ;
+
+( levels )
+
+variable level   0 level !
+
+defer perform ( v n -- | ... w 0 -- ... )
+defer deposit ( m n -- | m 0 -- m )
+
+:noname ( perform )
+  dup if   1- stow deposit   \call, pop perform   else
+  drop execute   then ; is perform
+
+:noname ( deposit )
+  dup if   1- stow deposit   \push, pop perform   else
+  drop   then ; is deposit
+
+( classes )
+
+: >name ( lnk-a -- a n )
+  1 cells -   dup @ tuck   chars - swap ;
+: name> ( a n -- lnk-a )
+  chars +   1 cells + ;
+
+: >class ( lnk-a -- cls-a )   1 cells + ;
+: class> ( cls-a -- lnk-a )   1 cells - ;
+
+label delay   0 ,
+
+: numeral-class ( a n lnk-a -- ... )
+  over discard   drop >number   swap 1 <> ?abort" numeral? " nip
+  delay @ deposit ;
+
+label (numeral)   0 , (numeral) , ' numeral-class , 
+(numeral) cell + constant numeral
+
+label latest   numeral ,
+
+: define ( a n cls -- )
+  tor   dup allot align dup negate allot   tuck folded, ,
+  latest @   here latest !   , , ;
+
+: constant-class ( ... a n lnk-a -- ... )
+  nip nip   >class 1 cells + @   delay @   deposit ;
+
+: define-constant ( m a n -- )   ['] constant-class define   , ;
+
+: :-class ( ... a n lnk-a -- ... )
+  swap discard nip   >class 1 cells + @   delay @   perform ;
+
+: define-: ( v a n -- )  ['] :-class define   , ;
+
+( interpreter )
+
+: find ( a n -- a' n' lnk-a )
+  latest @ push   begin
+    2dup peek >name rot ( a a' n' n )   2dup > if   2drop 2drop
+    else   drop collate 0 = if   peek >name nip clip pop exit
+    then   then   pop @ push
+  again ;
+
+: (]) ( -* )
+  begin   (stack) blanks   name find   dup >name nip discard
+    dup >class @ execute   again ;
 
 base !
