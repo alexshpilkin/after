@@ -143,13 +143,13 @@ label latest   (numeral) ,
     then   then   pop @ push
   again ;
 
-: (]) ( -* )
-  begin   blanks   name find   dup >name nip discard
-    dup >class @ execute   again ;
+: [-class ( a n lnk-a -* )   drop discard drop   throw ;
+s" [ " ' [-class define
 
-s" [ " ' :-class define   ' throw ,
-
-: ]   ['] (]) catch drop   length @ >in -!   0 length ! ;
+: ;-class ( bod-a colon-sys a n lnk-a -- )
+  drop discard drop   ] postpone ;   1 delay -!
+  swap here -   tuck allot   ,   negate allot   throw ;
+s" ; " ' ;-class define
 
 : t ( a n "name" -- )   ['] :-class define   ' , ;
 
@@ -171,13 +171,14 @@ s" . " t .
 : variable ( "name" -- ) ( -- a )
   label   1 cells allot ;
 
-: ;-class ( bod-a colon-sys a n lnk-a -- )
-  drop discard drop   postpone ;   1 delay -!   swap here -
-  tuck allot   ,   negate allot   throw ;
-s" ; " ' ;-class define
+: (]) ( -* )
+  begin   blanks   name find   dup >name nip discard
+    dup >class @ execute   again ;
+
+: ]   ['] (]) catch drop   length @ >in -!   0 length ! ;
 
 : : ( "name" -- )
   name tuck   ['] :-class define   discard   here ( bod-a ) 0 ,
-  1 delay +!   :noname ] ;
+  1 delay +!   :noname postpone [ ] ;
 
 base !
