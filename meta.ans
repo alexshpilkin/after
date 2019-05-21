@@ -1,4 +1,4 @@
-S" shim.ans" included   base @ hex
+S" shim.ans" included   hex
 
 : stack
   depth dup
@@ -156,10 +156,10 @@ s" ; " ' ;-class define
 : t ( "newname oldname" -- )
   blanks name tuck   ['] :-class define   discard   sync ' , ;
 
-t drop DROP   t dup DUP   t nip NIP   t swap SWAP   t over OVER
-t tuck TUCK   t rot ROT   t tor TOR
-t push PUSH   t pop POP   t lose LOSE   t stow STOW
-t peek PEEK
+t drop drop   t dup dup   t nip nip   t swap swap   t over over
+t tuck tuck   t rot rot   t tor tor
+t push push   t pop pop   t lose lose   t stow stow
+t peek peek
 t + +   t - -   t * *   t / /
 t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
 t @ @   t ! !   t +! +!   t -! -!
@@ -185,5 +185,3 @@ t . .
 : : ( "name" -- )
   blanks name tuck   ['] :-class define   discard
   here ( bod-a ) 0 ,   1 delay +!   :noname postpone [ ] ;
-
-base !
