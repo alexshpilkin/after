@@ -108,10 +108,9 @@ label delay   0 ,
   over discard   drop >number   swap 1 <> ?abort" numeral? " nip
   delay @ deposit ;
 
-label (numeral)   0 , (numeral) , ' numeral-class , 
-(numeral) cell + constant numeral
+0 , here dup , ' numeral-class ,   constant (numeral)
 
-label latest   numeral ,
+label latest   (numeral) ,
 
 : define ( a n cls -- )
   tor   dup allot align dup negate allot   tuck folded, ,
@@ -137,11 +136,20 @@ label latest   numeral ,
   again ;
 
 : (]) ( -* )
-  begin   (stack) blanks   name find   dup >name nip discard
+  begin   blanks   name find   dup >name nip discard
     dup >class @ execute   again ;
 
 : ]   ['] (]) catch drop ;   ' throw s" [ " define-:
 
-: constant   name define-constant ;
+: constant   name tuck   define-constant   discard ;
+
+: ;-class ( body-a colon-sys a n lnk-a -- )
+  drop discard drop   postpone ;   1 delay -!   swap here -
+  tuck allot   ,   negate allot   throw ;
+s" ; " ' ;-class define
+
+: :
+  name tuck   ['] :-class define   discard   here ( body-a ) 0 ,
+  1 delay +!   :noname ] ;
 
 base !
