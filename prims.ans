@@ -24,8 +24,6 @@ variable pops   label pushing
     stack @ emit ." psh = " type ." ; "   1 put +!   else
     stack @ tor   1 get +!   1 pops +!   then ;
 
-word_t x   word_t y   word_t z   word_t iptr
-
 : | ( ... -- )
   pushing @ if
     false pushing !   0 pops !   D:   else
@@ -47,6 +45,8 @@ word_t x   word_t y   word_t z   word_t iptr
 
 : {   7D parse type ;
 
+word_t x   word_t y   word_t z   word_t iptr
+
 case ABORT   { goto abort; } break
 case HALT    { goto halt; } break
 case EXIT    | R: iptr | break
@@ -65,5 +65,14 @@ case FETCHDT { x = dtop; } x break
 case STOREDP | x | { dptr = x; dchk; } break
 case STOREDB | x | { dbot = x; dchk; } break
 case STOREDT | x | { dtop = x; dchk; } break
+
+case DROP | x | break
+case DUP  | x | x x break
+case NIP  | x y | y break
+case SWAP | x y | y x break
+case OVER | x y | x y x break
+case TUCK | x y | y x y break
+case ROT  | x y z | y z x break
+case TOR  | x y z | z x y break
 
 bye

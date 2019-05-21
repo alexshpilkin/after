@@ -76,7 +76,7 @@ static fault_t run(void) {
 #define dpsh    psh(d)
 
 	for (;;) {
-		word_t insn, x;
+		word_t insn, x, y, z;
 
 		trace fprintf(stderr, "%" PRI0 " ", iptr);
 		addr(iptr); insn = memory[iptr++];
