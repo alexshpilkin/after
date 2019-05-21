@@ -37,8 +37,8 @@ variable length   0 length !
 : >number ( a n -- a' n' m )
   0 push   begin   dup 0 > while   over c@
     dup 30 39 between if   30 - pop 16* + push   else
-    dup 41 5A between if   37 - pop 16* + push   else
-    dup 61 7A between if   57 - pop 16* + push   else
+    dup 41 46 between if   37 - pop 16* + push   else
+    dup 61 66 between if   57 - pop 16* + push   else
     drop pop exit   then then then   1 clip   repeat
   pop ;
 
