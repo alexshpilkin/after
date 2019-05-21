@@ -119,12 +119,8 @@ label latest   (numeral) ,
 : constant-class ( ... a n lnk-a -- ... )
   nip nip   >class 1 cells + @   delay @   deposit ;
 
-: define-constant ( m a n -- )   ['] constant-class define   , ;
-
 : :-class ( ... a n lnk-a -- ... )
   swap discard nip   >class 1 cells + @   delay @   perform ;
-
-: define-: ( v a n -- )  ['] :-class define   , ;
 
 ( interpreter )
 
@@ -139,16 +135,35 @@ label latest   (numeral) ,
   begin   blanks   name find   dup >name nip discard
     dup >class @ execute   again ;
 
-: ]   ['] (]) catch drop ;   ' throw s" [ " define-:
+: ]   ['] (]) catch drop ;
+s" [ " ' :-class define   ' throw ,
 
-: constant   name tuck   define-constant   discard ;
+: t ( a n "name" -- )   ['] :-class define   ' , ;
+
+s" dup " t dup   s" drop " t drop   s" nip " t nip
+s" over " t over   s" swap " t swap   s" tuck " t swap
+s" + " t +    s" - " t -    s" * " t *   s" / " t /
+s" = " t =    s" > " t >    s" < " t <
+s" <> " t <>   s" <= " t <=   s" >= " t >=
+s" @ " t @    s" ! " t !    s" +! " t +!   s" -! " t -!
+s" . " t .
+
+: constant ( n "name" -- ) ( -- n )
+  name stow   ['] constant-class define   pop discard ;
+
+: label ( "name" -- ) ( -- a )
+  name stow   ['] constant-class define   here 1 cells + ,
+  pop discard ;
+
+: variable ( "name" -- ) ( -- a )
+  label   1 cells allot ;
 
 : ;-class ( body-a colon-sys a n lnk-a -- )
   drop discard drop   postpone ;   1 delay -!   swap here -
   tuck allot   ,   negate allot   throw ;
 s" ; " ' ;-class define
 
-: :
+: : ( "name" -- )
   name tuck   ['] :-class define   discard   here ( body-a ) 0 ,
   1 delay +!   :noname ] ;
 
