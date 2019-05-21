@@ -33,6 +33,8 @@ label buffer   size allot
 variable start   buffer start !
 variable length   0 length !
 
+: sync ( -- )   length @ >in -!   0 length ! ;
+
 : discard ( n -- )   dup start +!   length -! ;
 
 : expect ( n -- a m )
@@ -151,34 +153,37 @@ s" [ " ' [-class define
   swap here -   tuck allot   ,   negate allot   throw ;
 s" ; " ' ;-class define
 
-: t ( a n "name" -- )   ['] :-class define   ' , ;
+: t ( "newname oldname" -- )
+  blanks name tuck   ['] :-class define   discard   sync ' , ;
 
-s" dup " t dup   s" drop " t drop   s" nip " t nip
-s" over " t over   s" swap " t swap   s" tuck " t swap
-s" + " t +    s" - " t -    s" * " t *   s" / " t /
-s" = " t =    s" > " t >    s" < " t <
-s" <> " t <>   s" <= " t <=   s" >= " t >=
-s" @ " t @    s" ! " t !    s" +! " t +!   s" -! " t -!
-s" . " t .
+t drop DROP   t dup DUP   t nip NIP   t swap SWAP   t over OVER
+t tuck TUCK   t rot ROT   t tor TOR
+t push PUSH   t pop POP   t lose LOSE   t stow STOW
+t peek PEEK
+t + +   t - -   t * *   t / /
+t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
+t @ @   t ! !   t +! +!   t -! -!
+t . .
 
 : constant ( n "name" -- ) ( -- n )
-  blanks   name stow   ['] constant-class define   pop discard ;
+  blanks name tuck   ['] constant-class define   discard
+  sync ;
 
 : label ( "name" -- ) ( -- a )
-  blanks   name stow   ['] constant-class define
-  here 1 cells + ,   pop discard ;
+  blanks name tuck   ['] constant-class define   discard
+  here 1 cells + ,   sync ;
 
 : variable ( "name" -- ) ( -- a )
   label   1 cells allot ;
 
 : (]) ( -* )
-  begin   blanks   name find   dup >name nip discard
+  begin   blanks name find   dup >name nip discard
     dup >class @ execute   again ;
 
-: ]   ['] (]) catch drop   length @ >in -!   0 length ! ;
+: ]   ['] (]) catch drop   sync ;
 
 : : ( "name" -- )
-  name tuck   ['] :-class define   discard   here ( bod-a ) 0 ,
-  1 delay +!   :noname postpone [ ] ;
+  blanks name tuck   ['] :-class define   discard
+  here ( bod-a ) 0 ,   1 delay +!   :noname postpone [ ] ;
 
 base !
