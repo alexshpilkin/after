@@ -27,15 +27,15 @@ hex   S" tester.fth" included   ?stack
 { 5767 ,Y)  -> 5767 w,Y)  }
 { 57 b),Y)  -> 57 ),Y)    }
 
-{ 57 # adc, }                        { dict -> A9 57 }
-{ 57 # add, }                        { dict -> AB 57 }
-{ 57 # and, }                        { dict -> A4 57 }
-{ 57 # bcp, }                        { dict -> A5 57 }
-{ 57 # cpa, }                        { dict -> A1 57 }
-{ 57 # orr, }                        { dict -> AA 57 }
-{ 57 # sbc, }                        { dict -> A2 57 }
-{ 57 # sub, }                        { dict -> A0 57 }
-{ 57 # xor, }                        { dict -> A8 57 }
+{ 57 # adc, }                   { dict -> A9 57 }
+{ 57 # add, }                   { dict -> AB 57 }
+{ 57 # and, }                   { dict -> A4 57 }
+{ 57 # bcp, }                   { dict -> A5 57 }
+{ 57 # cpa, }                   { dict -> A1 57 }
+{ 57 # orr, }                   { dict -> AA 57 }
+{ 57 # sbc, }                   { dict -> A2 57 }
+{ 57 # sub, }                   { dict -> A0 57 }
+{ 57 # xor, }                   { dict -> A8 57 }
 
 { 57 # add, }                   { dict -> AB 57 }
 { 57 b) add, }                  { dict -> BB 57 }
@@ -54,19 +54,19 @@ hex   S" tester.fth" included   ?stack
 { 5767 w),X) add, }             { dict -> 72 DB 57 67 }
 { 57 b),Y) add, }               { dict -> 91 DB 57 }
 
-{ A clr, }                        { dict -> 4F }
-{ A dec, }                        { dict -> 4A }
-{ A inc, }                        { dict -> 4C }
-{ A neg, }                        { dict -> 40 }
-{ A not, }                        { dict -> 43 }
-{ A rlc, }                        { dict -> 49 }
-{ A rrc, }                        { dict -> 46 }
-{ A sla, }                        { dict -> 48 }
-{ A sll, }                        { dict -> 48 }
-{ A sra, }                        { dict -> 47 }
-{ A srl, }                        { dict -> 44 }
-{ A swp, }                        { dict -> 4E }
-{ A tnz, }                        { dict -> 4D }
+{ A clr, }                      { dict -> 4F }
+{ A dec, }                      { dict -> 4A }
+{ A inc, }                      { dict -> 4C }
+{ A neg, }                      { dict -> 40 }
+{ A not, }                      { dict -> 43 }
+{ A rlc, }                      { dict -> 49 }
+{ A rrc, }                      { dict -> 46 }
+{ A sla, }                      { dict -> 48 }
+{ A sll, }                      { dict -> 48 }
+{ A sra, }                      { dict -> 47 }
+{ A srl, }                      { dict -> 44 }
+{ A swp, }                      { dict -> 4E }
+{ A tnz, }                      { dict -> 4D }
 
 { A dec, }                      { dict -> 4A }
 { 57 b) dec, }                  { dict -> 3A 57 }
