@@ -15,7 +15,7 @@
 #endif
 
 #define verifyof(E) (0 * (int)sizeof(int [1 - 2*!!(E)]))
-#if defined __GNUC__ || defined __clang__
+#if defined __GNUC__ || defined __clang__ || defined __icc__
 #define countof(A) \
 	(sizeof(A) / sizeof((A)[0]) + \
 	 verifyof(__builtin_types_compatible_p(__typeof__(A), \
@@ -38,6 +38,9 @@ static word_t *restrict memory,
                rptr, rbot, rtop,
                dptr, dbot, dtop;
 
+#ifdef __GNUC__
+__attribute__((optimize("no-tree-tail-merge")))
+#endif
 static fault_t run(void) {
 
 #define addr(W) do { \
@@ -84,11 +87,10 @@ static fault_t run(void) {
 			              insn >= ibot && insn < itop && symbol &&
 			              symbol[insn] ? symbol[insn] : "");
 			rput(1); rpsh = iptr; iptr = insn; break;
-#define PRIM(NAME, ID, BODY) \
+#define PRIM(ID, BODY, PROLOGUE) \
 		case P##ID: \
-			trace fprintf(stderr, "%-16s ", NAME); \
-			{ BODY } break;
-PRIMS
+			trace fprintf(stderr, "%-16s ", #ID); \
+			{ PROLOGUE BODY } break;
 #include "prims.h"
 #undef PRIM
 		}

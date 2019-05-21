@@ -1,0 +1,69 @@
+s" shim.ans" included   hex
+
+variable stack
+variable rget   variable rput
+variable dget   variable dput
+variable \get   variable \put
+: get   \get @ ;   : put   \put @ ;
+
+: R:   72 stack !   rget \get !   rput \put ! ;
+: D:   64 stack !   dget \get !   dput \put ! ;
+
+variable pops   label pushing
+
+: clip ( a n m -- a+m n-m )   tuck - tor + swap ;
+
+: string, ( a n -- )
+  begin   dup while   over c@ c,   1 clip repeat   2drop ;
+
+: word_t ( "name" -- )
+  >in @ push   create   pop >in !   parse-name   dup , string,
+;does:
+  dup 1 cells + swap @
+  pushing @ if
+    stack @ emit ." psh = " type ." ; "   1 put +!   else
+    stack @ tor   1 get +!   1 pops +!   then ;
+
+word_t x   word_t y   word_t z   word_t iptr
+
+: | ( ... -- )
+  pushing @ if
+    false pushing !   0 pops !   D:   else
+    true pushing !   begin   pops @ while
+      type ."  = " emit ." pop; "   1 pops -!   repeat
+    then ;
+
+: case ( -- )
+  0 rget !   0 rput !   0 dget !   0 dput !   D:
+  ." PRIM( " parse-name type ." , " ;
+
+: break ( -- )
+  ." , "
+  rget @ if   ." rget( " rget @ . ." ); "   then
+  rput @ if   ." rput( " rput @ . ." ); "   then
+  dget @ if   ." dget( " dget @ . ." ); "   then
+  dput @ if   ." dput( " dput @ . ." ); "   then
+  ." ; )" cr ;
+
+: {   7D parse type ;
+
+case ABORT   { goto abort; } break
+case HALT    { goto halt; } break
+case EXIT    | R: iptr | break
+case EXECUTE R: iptr | iptr | break
+
+case FETCHRP { x = rptr; } x break
+case FETCHRB { x = rbot; } x break
+case FETCHRT { x = rtop; } x break
+case STORERP | x | { rptr = x; rchk; } break
+case STORERB | x | { rbot = x; rchk; } break
+case STORERT | x | { rtop = x; rchk; } break
+
+case FETCHDP { x = dptr; } x break
+case FETCHDB { x = dbot; } x break
+case FETCHDT { x = dtop; } x break
+case STOREDP | x | { dptr = x; dchk; } break
+case STOREDB | x | { dbot = x; dchk; } break
+case STOREDT | x | { dtop = x; dchk; } break
+
+bye
