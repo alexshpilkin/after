@@ -14,13 +14,24 @@ variable catcher
   pop catcher !   false ;
 : throw   catcher @ rp!   pop catcher !   true ;
 
+: clip ( a n m -- a+m n-m )   tuck - tor + swap ;
+
+variable newline   false newline !
+
+: accept ( a n -- m )
+  newline @ if
+    drop   0A swap !   false newline !   1 exit   then
+  source >in @ clip   dup 0 = if
+    2drop refill   0 = ?abort" input? "   source   then
+  rot ( a src-a src-n n ) 2dup <= if
+    true newline !   drop   else   nip   then
+  push swap peek   2dup chars + 0A swap c!   cmove
+  pop   dup >in +! ;
+
 100 constant size
 label buffer   size allot
 variable start   buffer start !
 variable length   0 length !
-
-: accept ( a n -- m )
-  swap dup rot   1 - accept   tuck + 0A swap c!   1 + ;
 
 : discard ( n -- )   dup start +!   length -! ;
 
@@ -31,8 +42,6 @@ variable length   0 length !
   begin   dup length @ > while   start @ length @ +
     size length @ -   accept   length +!   repeat
   drop start @ length @ ;
-
-: clip ( a n m -- a+m n-m )   tuck - tor + swap ;
 
 : >number ( a n -- a' n' m )
   0 push   begin   dup 0 > while   over c@
@@ -108,7 +117,7 @@ defer deposit ( m n -- | m 0 -- m )
 label delay   0 ,
 
 : numeral-class ( a n lnk-a -- ... )
-  over discard   drop >number   swap 1 <> ?abort" numeral? " nip
+  over discard   drop >number   swap 1 <> ?abort" term? " nip
   delay @ deposit ;
 
 0 , here dup , ' numeral-class ,   constant (numeral)
@@ -138,8 +147,9 @@ label latest   (numeral) ,
   begin   blanks   name find   dup >name nip discard
     dup >class @ execute   again ;
 
-: ]   ['] (]) catch drop ;
 s" [ " ' :-class define   ' throw ,
+
+: ]   ['] (]) catch drop   length @ >in -!   0 length ! ;
 
 : t ( a n "name" -- )   ['] :-class define   ' , ;
 
@@ -152,11 +162,11 @@ s" @ " t @    s" ! " t !    s" +! " t +!   s" -! " t -!
 s" . " t .
 
 : constant ( n "name" -- ) ( -- n )
-  name stow   ['] constant-class define   pop discard ;
+  blanks   name stow   ['] constant-class define   pop discard ;
 
 : label ( "name" -- ) ( -- a )
-  name stow   ['] constant-class define   here 1 cells + ,
-  pop discard ;
+  blanks   name stow   ['] constant-class define
+  here 1 cells + ,   pop discard ;
 
 : variable ( "name" -- ) ( -- a )
   label   1 cells allot ;
