@@ -8,6 +8,12 @@ S" shim.ans" included   base @ hex
 
 ( shim )
 
+variable catcher
+
+: catch   catcher @ push   rp@ catcher !   execute
+  pop catcher !   false ;
+: throw   catcher @ rp!   pop catcher !   true ;
+
 100 constant size
 label buffer   size allot
 variable start   buffer start !
@@ -133,5 +139,9 @@ label latest   numeral ,
 : (]) ( -* )
   begin   (stack) blanks   name find   dup >name nip discard
     dup >class @ execute   again ;
+
+: ]   ['] (]) catch drop ;   ' throw s" [ " define-:
+
+: constant   name define-constant ;
 
 base !
