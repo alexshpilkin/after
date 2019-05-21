@@ -102,6 +102,9 @@ defer deposit ( m n -- | m 0 -- m )
 : >class ( lnk-a -- cls-a )   1 cells + ;
 : class> ( cls-a -- lnk-a )   1 cells - ;
 
+: >body ( lnk-a -- bod-a )   2 cells + ;
+: body> ( bod-a -- lnk-a )   1 cells - ;
+
 label delay   0 ,
 
 : numeral-class ( a n lnk-a -- ... )
@@ -117,10 +120,10 @@ label latest   (numeral) ,
   latest @   here latest !   , , ;
 
 : constant-class ( ... a n lnk-a -- ... )
-  nip nip   >class 1 cells + @   delay @   deposit ;
+  nip nip   >body @   delay @   deposit ;
 
 : :-class ( ... a n lnk-a -- ... )
-  swap discard nip   >class 1 cells + @   delay @   perform ;
+  swap discard nip   >body @   delay @   perform ;
 
 ( interpreter )
 
@@ -158,13 +161,13 @@ s" . " t .
 : variable ( "name" -- ) ( -- a )
   label   1 cells allot ;
 
-: ;-class ( body-a colon-sys a n lnk-a -- )
+: ;-class ( bod-a colon-sys a n lnk-a -- )
   drop discard drop   postpone ;   1 delay -!   swap here -
   tuck allot   ,   negate allot   throw ;
 s" ; " ' ;-class define
 
 : : ( "name" -- )
-  name tuck   ['] :-class define   discard   here ( body-a ) 0 ,
+  name tuck   ['] :-class define   discard   here ( bod-a ) 0 ,
   1 delay +!   :noname ] ;
 
 base !
