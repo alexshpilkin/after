@@ -88,9 +88,7 @@ variable length   0 length !
     tuck scan-blanks nip -   dup pop + push   0 = until
   pop 1 + dup expect drop swap ;
 
-( levels )
-
-variable level   0 level !
+( delay )
 
 defer perform ( v n -- | ... w 0 -- ... )
 defer deposit ( m n -- | m 0 -- m )
@@ -103,7 +101,7 @@ defer deposit ( m n -- | m 0 -- m )
   dup if   1- stow deposit   \push, pop perform   else
   drop   then ; is deposit
 
-( classes )
+( interpreter )
 
 : >name ( lnk-a -- a n )
   1 cells -   dup @ tuck   chars - swap ;
@@ -130,14 +128,6 @@ label latest   (numeral) ,
   tor   dup allot align dup negate allot   tuck folded, ,
   latest @   here latest !   , , ;
 
-: constant-class ( ... a n lnk-a -- ... )
-  nip nip   >body @   delay @   deposit ;
-
-: :-class ( ... a n lnk-a -- ... )
-  swap discard nip   >body @   delay @   perform ;
-
-( interpreter )
-
 : find ( a n -- a' n' lnk-a )
   latest @ push   begin
     2dup peek >name rot ( a a' n' n )   2dup > if   2drop 2drop
@@ -145,28 +135,8 @@ label latest   (numeral) ,
     then   then   pop @ push
   again ;
 
-: [-class ( a n lnk-a -* )   drop discard drop   throw ;
-s" [ " ' [-class define
-
-: ;-class ( bod-a colon-sys a n lnk-a -- )
-  drop discard drop   ] postpone ;   1 delay -!
-  swap here -   tuck allot   ,   negate allot   throw ;
-s" ; " ' ;-class define
-
-: t ( "newname oldname" -- )
-  blanks name tuck   ['] :-class define   discard   sync ' , ;
-
-\ FIXME
-\ t if if   t else else   t then then   t begin begin
-\ t while while   t again again   t repeat repeat   t until until
-t drop drop   t dup dup   t nip nip   t swap swap   t over over
-t tuck tuck   t rot rot   t tor tor
-t push push   t pop pop   t lose lose   t stow stow
-t peek peek
-t + +   t - -   t * *   t / /
-t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
-t @ @   t ! !   t +! +!   t -! -!
-t . .
+: constant-class ( ... a n lnk-a -- ... )
+  nip nip   >body @   delay @   deposit ;
 
 : tconstant ( n "name" -- ) ( -- n )
   blanks name tuck   ['] constant-class define   discard
@@ -179,11 +149,22 @@ t . .
 : tvariable ( "name" -- ) ( -- a )
   label   1 cells allot ;
 
+: [-class ( a n lnk-a -* )   drop discard drop   throw ;
+s" [ " ' [-class define
+
 : (t]) ( -* )
   begin   blanks name find   dup >name nip discard
     dup >class @ execute   again ;
 
 : t]   ['] (t]) catch drop   sync ;
+
+: ;-class ( bod-a colon-sys a n lnk-a -- )
+  drop discard drop   ] postpone ;   1 delay -!
+  swap here -   tuck allot   ,   negate allot   throw ;
+s" ; " ' ;-class define
+
+: :-class ( ... a n lnk-a -- ... )
+  swap discard nip   >body @   delay @   perform ;
 
 : t: ( "name" -- )
   blanks name tuck   ['] :-class define   discard
@@ -209,3 +190,17 @@ variable stage   1 stage !   defer ]
   ['] hvariable is variable   ['] h: is :   ['] h] is ] ;
 
 ' h] is ]
+
+( exports )
+
+: t ( "newname oldname" -- )
+  blanks name tuck   ['] :-class define   discard   sync ' , ;
+
+t drop drop   t dup dup   t nip nip   t swap swap   t over over
+t tuck tuck   t rot rot   t tor tor
+t push push   t pop pop   t lose lose   t stow stow
+t peek peek
+t + +   t - -   t * *   t / /
+t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
+t @ @   t ! !   t +! +!   t -! -!
+t . .
