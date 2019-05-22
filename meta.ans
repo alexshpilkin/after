@@ -156,6 +156,9 @@ s" ; " ' ;-class define
 : t ( "newname oldname" -- )
   blanks name tuck   ['] :-class define   discard   sync ' , ;
 
+\ FIXME
+\ t if if   t else else   t then then   t begin begin
+\ t while while   t again again   t repeat repeat   t until until
 t drop drop   t dup dup   t nip nip   t swap swap   t over over
 t tuck tuck   t rot rot   t tor tor
 t push push   t pop pop   t lose lose   t stow stow
@@ -165,23 +168,44 @@ t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
 t @ @   t ! !   t +! +!   t -! -!
 t . .
 
-: constant ( n "name" -- ) ( -- n )
+: tconstant ( n "name" -- ) ( -- n )
   blanks name tuck   ['] constant-class define   discard
   sync ;
 
-: label ( "name" -- ) ( -- a )
+: tlabel ( "name" -- ) ( -- a )
   blanks name tuck   ['] constant-class define   discard
   here 1 cells + ,   sync ;
 
-: variable ( "name" -- ) ( -- a )
+: tvariable ( "name" -- ) ( -- a )
   label   1 cells allot ;
 
-: (]) ( -* )
+: (t]) ( -* )
   begin   blanks name find   dup >name nip discard
     dup >class @ execute   again ;
 
-: ]   ['] (]) catch drop   sync ;
+: t]   ['] (t]) catch drop   sync ;
 
-: : ( "name" -- )
+: t: ( "name" -- )
   blanks name tuck   ['] :-class define   discard
-  here ( bod-a ) 0 ,   1 delay +!   :noname postpone [ ] ;
+  here ( bod-a ) 0 ,   1 delay +!   :noname postpone [ t] ;
+
+( staging )
+
+: hconstant constant ;  defer constant  ' hconstant is constant
+: hlabel label ;        defer label     ' hlabel is label
+: hvariable variable ;  defer variable  ' hvariable is variable
+: h: : ;                defer :         ' h: is :
+
+variable stage   1 stage !   defer ]
+
+: h]
+  stage @ 1 -   dup stage !   if exit then
+  ['] tconstant is constant   ['] tlabel is label
+  ['] tvariable is variable   ['] t: is :   ['] t] is ] ;
+
+: [
+  1 stage +!
+  ['] hconstant is constant   ['] hlabel is label
+  ['] hvariable is variable   ['] h: is :   ['] h] is ] ;
+
+' h] is ]
