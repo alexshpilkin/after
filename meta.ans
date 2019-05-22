@@ -140,7 +140,7 @@ label latest   (numeral) ,
 
 : tconstant ( n "name" -- ) ( -- n )
   blanks name tuck   ['] constant-class define   discard
-  sync ;
+  ,   sync ;
 
 : tlabel ( "name" -- ) ( -- a )
   blanks name tuck   ['] constant-class define   discard
