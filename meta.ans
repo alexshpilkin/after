@@ -204,3 +204,14 @@ t + +   t - -   t * *   t / /
 t = =   t <> <>   t < <   t >= >=   t > >   t <= <=
 t @ @   t ! !   t +! +!   t -! -!
 t . .
+
+: c-class ( ... a n lnk-a -- ... )
+  swap discard nip   >body @   delay @
+  dup 0 = ?abort" delay? "   1 - perform ;
+
+: c ( "newname oldname" -- )
+  blanks name   dup discard sync   :noname postpone postpone
+  postpone ; ( a n v ) tor   ['] c-class define   , ;
+
+c if if   c else else   c then then   c begin begin
+c while while   c again again   c until until   c repeat repeat
