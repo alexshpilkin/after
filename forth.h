@@ -42,12 +42,4 @@ FAULTS
 	NFAULTS
 } fault_t;
 
-enum {
-#define PRIM(ID, BODY, PROLOGUE) \
-	P##ID,
-#include "prims.h"
-#undef PRIM
-	NPRIMS
-};
-
 #endif /* ndef FORTH_H_ */

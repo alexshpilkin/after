@@ -87,10 +87,10 @@ static fault_t run(void) {
 			              insn >= ibot && insn < itop && symbol &&
 			              symbol[insn] ? symbol[insn] : "");
 			rput(1); rpsh = iptr; iptr = insn; break;
-#define PRIM(ID, BODY, PROLOGUE) \
-		case P##ID: \
-			trace fprintf(stderr, "%-16s ", #ID); \
-			{ PROLOGUE BODY } break;
+#define PRIM(CODE, NAME, BODY, PROLOGUE) \
+		case CODE: \
+			trace fprintf(stderr, "%-16s ", NAME); \
+			PROLOGUE BODY break;
 #include "prims.h"
 #undef PRIM
 		}
@@ -117,8 +117,8 @@ FAULTS
 word_t image[] = {
 	0, 0, 0, 0,
 	0, 0, 0, 0,
-	0xB, 0xE, ~PHALT, ~PFETCHRP,
-	~PSTORERP, ~PEXIT, 0xB, ~PEXIT,
+	0xB, 0xE, ~0x1, ~0x4,
+	~0x7, ~0x2, 0xB, ~0x2,
 };
 char const *const imsym[countof(image)] = {
 	0, 0, 0, 0,
