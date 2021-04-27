@@ -1,15 +1,15 @@
 s" shim.ans" included   hex
 
-variable stack
-variable rget   variable rput
-variable dget   variable dput
-variable \get   variable \put
-: get   \get @ ;   : put   \put @ ;
+variable \stack
+: stack    \stack @ ;
+: change   \stack @ 1 cells + ;
+: get      \stack @ 2 cells + ;
+: put      \stack @ 3 cells + ;
 
-: R:   72 stack !   rget \get !   rput \put ! ;
-: D:   64 stack !   dget \get !   dput \put ! ;
+label rstack   72 , 3 cells allot   : R:   rstack \stack ! ;
+label dstack   64 , 3 cells allot   : D:   dstack \stack ! ;
 
-variable pops   label pushing
+variable pops   label pushing   true ,
 
 : clip ( a n m -- a+m n-m )   tuck - tor + swap ;
 
@@ -19,10 +19,12 @@ variable pops   label pushing
 : word_t ( "name" -- )
   >in @ push   create   pop >in !   parse-name   dup , string,
 ;does:
-  dup 1 cells + swap @
+  dup 1 cells + swap @ ( a n )
   pushing @ if
-    stack @ emit ." psh = " type ." ; "   1 put +!   else
-    stack @ tor   1 get +!   1 pops +!   then ;
+    stack @ emit ." psh = " type ." ; "
+      change @ 1 + dup change !   put @ max put !   else
+    stack @ tor   1 pops +!
+      change @ 1 - dup change !   get @ min get !   then ;
 
 : | ( ... -- )
   pushing @ if
@@ -32,15 +34,16 @@ variable pops   label pushing
     then ;
 
 : case ( -- )
-  0 rget !   0 rput !   0 dget !   0 dput !   D:
+  R:   0 change !   0 get !   0 put !
+  D:   0 change !   0 get !   0 put !
   ." PRIM( " parse-name type ." , " ;
 
 : break ( -- )
   ." , "
-  rget @ if   ." rget( " rget @ . ." ); "   then
-  rput @ if   ." rput( " rput @ . ." ); "   then
-  dget @ if   ." dget( " dget @ . ." ); "   then
-  dput @ if   ." dput( " dput @ . ." ); "   then
+  R: get @ if   ." rget( " get @ negate . ." ); "   then
+     put @ if   ." rput( " put @ . ." ); "   then
+  D: get @ if   ." dget( " get @ negate . ." ); "   then
+     put @ if   ." dput( " put @ . ." ); "   then
   ." ; )" cr ;
 
 : {   7D parse type ;
